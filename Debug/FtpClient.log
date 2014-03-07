@@ -1,0 +1,27 @@
+﻿Build started 2014-03-07 22:36:28.
+     1>Project "F:\projekty\CPP\FtpClient\FtpClient.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\programy\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt -mms-bitfields -IF:/projekty/CPP/GTK/include/gtk-3.0 -IF:/projekty/CPP/GTK/include/cairo -IF:/projekty/CPP/GTK/include/pango-1.0 -IF:/projekty/CPP/GTK/include/atk-1.0 -IF:/projekty/CPP/GTK/include/cairo -IF:/projekty/CPP/GTK/include/pixman-1 -IF:/projekty/CPP/GTK/include -IF:/projekty/CPP/GTK/include/freetype2 -IF:/projekty/CPP/GTK/include -IF:/projekty/CPP/GTK/include/libpng15 -IF:/projekty/CPP/GTK/include/gdk-pixbuf-2.0 -IF:/projekty/CPP/GTK/include/libpng15 -IF:/projekty/CPP/GTK/include/glib-2.0 -IF:/projekty/CPP/GTK/lib/glib-2.0/include 
+          src\VIEW\IMP\ViewGuiBuilder.cpp src\startFile.cpp
+     1>cl : Command line warning D9002: ignoring unknown option '-mms-bitfields'
+         ViewGuiBuilder.cpp
+         Generating Code...
+         Compiling...
+         startFile.cpp
+         Generating Code...
+       Link:
+         C:\programy\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\projekty\CPP\FtpClient\Debug\FtpClient.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\projekty\CPP\FtpClient\Debug\FtpClient.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\projekty\CPP\FtpClient\Debug\FtpClient.lib" /MACHINE:X86 /libpath:F:/projekty/CPP/GTK/lib.lib atk-1.0.lib cairo.lib fontconfig.lib gailutil.lib gdk-win32-3.0.lib gdk_pixbuf-2.0.lib gio-2.0.lib glib-2.0.lib gmodule-2.0.lib gobject-2.0.lib gthread-2.0.lib gtk-win32-3.0.lib pango-1.0.lib pangocairo-1.0.lib pangoft2-1.0.lib pangowin32-1.0.lib /ENTRY:mainCRTStartup
+          Debug\ControlConnectionManager.obj
+         Debug\ControlExceptionManager.obj
+         Debug\ControlMain.obj
+         Debug\ExceptionContainer.obj
+         Debug\ModelConnection.obj
+         Debug\ModelDAO.obj
+         Debug\startFile.obj
+         Debug\ViewGuiBuilder.obj
+         FtpClient.vcxproj -> F:\projekty\CPP\FtpClient\Debug\FtpClient.exe
+     1>Done Building Project "F:\projekty\CPP\FtpClient\FtpClient.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:05.84

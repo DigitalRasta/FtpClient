@@ -24,5 +24,6 @@ int main(int argc, char* argv[])
 	* Start program - all control receive controller
 	*/
 	controlMainObject->startFtpClient(); 
+	gtk_main(); 
     return 0;
 }

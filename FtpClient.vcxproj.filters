@@ -39,6 +39,9 @@
     <ClCompile Include="src\CONTROLLER\IMP\ControlMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\VIEW\IMP\ViewFileListManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ExceptionContainer.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\InnerConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VIEW\HEADER\ViewFileListManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -15,6 +15,11 @@ public:
 
 	void startFtpClient(void);
 
+	/*
+	*Interface
+	*/
+	virtual void connectWindowButtonConnectClicked(std::string host, std::string port, std::string login, std::string password);
+
 	virtual ~ControlMain(void);
 private:
 	ViewGuiBuilderInterface* viewGuiBuilderObject;

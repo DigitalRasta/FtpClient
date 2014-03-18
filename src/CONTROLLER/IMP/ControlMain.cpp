@@ -11,8 +11,13 @@ ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAO
 
 void ControlMain::startFtpClient(void) {
 	this->viewGuiBuilderObject->initializeMainWindow();
+	this->viewGuiBuilderObject->bindMainWindowEvents(this);
+	this->viewGuiBuilderObject->spawnConnectWindow();
 }
 
+void ControlMain::connectWindowButtonConnectClicked(std::string host, std::string port, std::string login, std::string password) {
+	//TODO
+}
 
 ControlMain::~ControlMain(void){
 }

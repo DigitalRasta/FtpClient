@@ -135,43 +135,35 @@ void ViewGuiBuilder::destroyConnectWindow(void) {
 
 
 void ViewGuiBuilder::spawnExceptionWindow(std::string message, ExceptionLevel errorLevel) {
-	this->exceptionWindow = gtk_dialog_new();
-	gtk_window_set_title(GTK_WINDOW(this->exceptionWindow), this->innerConfigObject->lang_exceptionWindowTitle.c_str());
-	gtk_widget_set_size_request(this->exceptionWindow, this->innerConfigObject->view_exceptionWindowWidth, this->innerConfigObject->view_exceptionWindowHeight);
-	gtk_window_set_resizable(GTK_WINDOW(this->exceptionWindow), FALSE);
-	gtk_window_set_position(GTK_WINDOW(this->exceptionWindow), GTK_WIN_POS_CENTER);
-	gtk_widget_override_background_color(this->exceptionWindow, GTK_STATE_FLAG_NORMAL, &this->innerConfigObject->view_mainWindowBackground);
-	GtkWidget* contentArea = gtk_dialog_get_content_area (GTK_DIALOG (this->exceptionWindow));
-	gtk_container_add(GTK_CONTAINER(contentArea), this->buildExceptionWindowInterface());
-	//Events
+	GtkMessageType error;
+	switch(errorLevel) {
+	case STANDARD:
+		error = GTK_MESSAGE_INFO;
+		break;
+	case HIGH:
+		error = GTK_MESSAGE_WARNING;
+		break;
+	case CRITICAL:
+		error = GTK_MESSAGE_ERROR;
+		break;
+	}
+	this->exceptionWindow = gtk_message_dialog_new(GTK_WINDOW(this->mainWindowHandler), GTK_DIALOG_DESTROY_WITH_PARENT, error, GTK_BUTTONS_OK, message.c_str());
+	g_signal_connect(this->exceptionWindow, "response",G_CALLBACK(this->exceptionWindowOkButton), this);
 	gtk_widget_show_all (this->exceptionWindow);
 	gtk_dialog_run(GTK_DIALOG(this->exceptionWindow));
 }
 
-GtkWidget* ViewGuiBuilder::buildExceptionWindowInterface(std::string message, ExceptionLevel errorLevel) {
-	GtkWidget* exceptionWindowManager = gtk_grid_new();
-	std::string iconSrc;
-	switch(errorLevel) {
-		case STANDARD:
-			iconSrc = innerConfigObject->view_exceptionWindowIconSrcStandard;
-			break;
-		case HIGH:
-			iconSrc = innerConfigObject->view_exceptionWindowIconSrcHigh;
-			break;
-		case CRITICAL:
-			iconSrc = innerConfigObject->view_exceptionWindowIconSrcCritical;
-			break;
-	}
-	GtkWidget* iconImage = gtk_image_new_from_file(iconSrc.c_str());
-	GtkWidget* label_message = gtk_label_new(message.c_str());
-	gtk_widget_set_hexpand(label_message, TRUE);
-
-	this->exceptionWindow_buttonOk = gtk_button_new_with_label("OK");
-	gtk_grid_attach(GTK_GRID(exceptionWindowManager), iconImage,0,0,1,1);
-	gtk_grid_attach(GTK_GRID(exceptionWindowManager), label_message,1,0,1,1);
-	return exceptionWindowManager;
+void ViewGuiBuilder::exceptionWindowOkButton(GtkDialog* dialog, gint id, gpointer* data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->destroyExceptionWindow();
 }
 
+void ViewGuiBuilder::destroyExceptionWindow(void) {
+	if(this->exceptionWindow != NULL) {
+		gtk_widget_destroy(this->exceptionWindow);
+		this->exceptionWindow = NULL;
+	}
+}
 
 
 ViewGuiBuilder::~ViewGuiBuilder(void){

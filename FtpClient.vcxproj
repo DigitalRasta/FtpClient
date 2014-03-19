@@ -84,6 +84,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="lib\Ultimate TCP-IP\ftp_c.cpp" />
+    <ClCompile Include="lib\Ultimate TCP-IP\UTDataSource.cpp" />
+    <ClCompile Include="lib\Ultimate TCP-IP\utfile.cpp" />
+    <ClCompile Include="lib\Ultimate TCP-IP\utstrlst.cpp" />
+    <ClCompile Include="lib\Ultimate TCP-IP\ut_clnt.cpp" />
+    <ClCompile Include="lib\Ultimate TCP-IP\UT_Queue.cpp" />
+    <ClCompile Include="lib\Ultimate TCP-IP\UT_StrOp.cpp" />
     <ClCompile Include="src\CONTROLLER\IMP\ControlConnectionManager.cpp" />
     <ClCompile Include="src\CONTROLLER\IMP\ControlExceptionManager.cpp" />
     <ClCompile Include="src\CONTROLLER\IMP\ControlMain.cpp" />
@@ -95,6 +102,16 @@
     <ClCompile Include="src\VIEW\IMP\ViewGuiBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="lib\Ultimate TCP-IP\ftp_c.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\stdafx.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\UTDataSource.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\uterr.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\UTExtErr.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\utfile.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\utstrlst.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\ut_clnt.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\UT_Queue.h" />
+    <ClInclude Include="lib\Ultimate TCP-IP\ut_strop.h" />
     <ClInclude Include="src\CONTROLLER\HEADER\ControlConnectionManager.h" />
     <ClInclude Include="src\CONTROLLER\HEADER\ControlExceptionManager.h" />
     <ClInclude Include="src\CONTROLLER\HEADER\ControlMain.h" />

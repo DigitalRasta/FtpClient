@@ -42,6 +42,27 @@
     <ClCompile Include="src\VIEW\IMP\ViewFileListManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lib\Ultimate TCP-IP\ftp_c.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Ultimate TCP-IP\ut_clnt.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Ultimate TCP-IP\UT_Queue.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Ultimate TCP-IP\UT_StrOp.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Ultimate TCP-IP\UTDataSource.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Ultimate TCP-IP\utfile.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Ultimate TCP-IP\utstrlst.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ExceptionContainer.h">
@@ -82,6 +103,36 @@
     </ClInclude>
     <ClInclude Include="src\VIEW\HEADER\ViewFileListManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\ftp_c.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\stdafx.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\ut_clnt.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\UT_Queue.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\ut_strop.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\UTDataSource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\UTExtErr.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\utfile.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\utstrlst.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Ultimate TCP-IP\uterr.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -37,6 +37,9 @@ public:
 	*	*errorLevel: needed for display proper window
 	*/
 	virtual void spawnExceptionWindow(std::string message, ExceptionLevel errorLevel);
+
+
+	virtual void destroyExceptionWindow(void);
 private:
 	InnerConfig* innerConfigObject;
 	ControlMainEventsInterface* controlObject;
@@ -75,12 +78,6 @@ private:
 
 
 	/*
-	* Build content for exceptionWindow
-	* Return: Container containing elements to show
-	*/
-	virtual GtkWidget* buildExceptionWindowInterface(std::string message, ExceptionLevel errorLevel);
-
-	/*
 	*Events
 	* Callback for connect button in connectWindow. Send to control object data received from connectWindow form.
 	* Params:
@@ -97,6 +94,15 @@ private:
 	*	data - pointer casting to ViewGuiBuilder object
 	*/
 	static void mainWindowMenuBarButtonConnectClicked(GtkWidget* object, gpointer* data);
+
+	/*
+	*Events
+	* Callback for OK button in exceptionWindow. Destroys it.
+	* Params:
+	*	object - do nothing, lib require
+	*	data - pointer casting to ViewGuiBuilder object
+	*/
+	static void exceptionWindowOkButton(GtkDialog* dialog, gint id, gpointer* data);
 
 };
 

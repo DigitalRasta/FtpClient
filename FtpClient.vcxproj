@@ -21,6 +21,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -41,8 +42,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>F:\projekty\CPP\GTK\include\glib-2.0;F:\projekty\CPP\GTK\include\gtk-3.0;F:\projekty\CPP\GTK\include;F:\projekty\CPP\GTK\lib\glib-2.0\include;F:\projekty\CPP\GTK\lib\gtk-3.0;F:\projekty\CPP\GTK\lib;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\projekty\CPP\GTK\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\projekty\CPP\GTK\include\glib-2.0;F:\projekty\CPP\GTK\include\gtk-3.0;F:\projekty\CPP\GTK\include;F:\projekty\CPP\GTK\lib\glib-2.0\include;F:\projekty\CPP\GTK\lib\gtk-3.0;F:\projekty\CPP\GTK\lib;$(VCInstallDir)UnitTest\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\projekty\CPP\GTK\lib;$(VCInstallDir)UnitTest\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -91,15 +92,15 @@
     <ClCompile Include="lib\Ultimate TCP-IP\ut_clnt.cpp" />
     <ClCompile Include="lib\Ultimate TCP-IP\UT_Queue.cpp" />
     <ClCompile Include="lib\Ultimate TCP-IP\UT_StrOp.cpp" />
-    <ClCompile Include="src\CONTROLLER\IMP\ControlConnectionManager.cpp" />
-    <ClCompile Include="src\CONTROLLER\IMP\ControlExceptionManager.cpp" />
-    <ClCompile Include="src\CONTROLLER\IMP\ControlMain.cpp" />
-    <ClCompile Include="src\ExceptionContainer.cpp" />
-    <ClCompile Include="src\MODEL\IMP\ModelConnection.cpp" />
-    <ClCompile Include="src\MODEL\IMP\ModelDAO.cpp" />
-    <ClCompile Include="src\startFile.cpp" />
-    <ClCompile Include="src\VIEW\IMP\ViewFileListManager.cpp" />
-    <ClCompile Include="src\VIEW\IMP\ViewGuiBuilder.cpp" />
+    <ClCompile Include="src\definition\ControlConnectionManager.cpp" />
+    <ClCompile Include="src\definition\ControlExceptionManager.cpp" />
+    <ClCompile Include="src\definition\ControlMain.cpp" />
+    <ClCompile Include="src\definition\ExceptionContainer.cpp" />
+    <ClCompile Include="src\definition\ModelConnection.cpp" />
+    <ClCompile Include="src\definition\ModelDAO.cpp" />
+    <ClCompile Include="src\definition\startFile.cpp" />
+    <ClCompile Include="src\definition\ViewFileListManager.cpp" />
+    <ClCompile Include="src\definition\ViewGuiBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\Ultimate TCP-IP\ftp_c.h" />
@@ -112,19 +113,19 @@
     <ClInclude Include="lib\Ultimate TCP-IP\ut_clnt.h" />
     <ClInclude Include="lib\Ultimate TCP-IP\UT_Queue.h" />
     <ClInclude Include="lib\Ultimate TCP-IP\ut_strop.h" />
-    <ClInclude Include="src\CONTROLLER\HEADER\ControlConnectionManager.h" />
-    <ClInclude Include="src\CONTROLLER\HEADER\ControlExceptionManager.h" />
-    <ClInclude Include="src\CONTROLLER\HEADER\ControlMain.h" />
-    <ClInclude Include="src\CONTROLLER\HEADER\ControlMainEventsInterface.h" />
-    <ClInclude Include="src\ExceptionContainer.h" />
-    <ClInclude Include="src\InnerConfig.h" />
-    <ClInclude Include="src\MODEL\HEADER\ModelConnection.h" />
-    <ClInclude Include="src\MODEL\HEADER\ModelConnectionInterface.h" />
-    <ClInclude Include="src\MODEL\HEADER\ModelDAO.h" />
-    <ClInclude Include="src\MODEL\HEADER\ModelDAOInterface.h" />
-    <ClInclude Include="src\VIEW\HEADER\ViewFileListManager.h" />
-    <ClInclude Include="src\VIEW\HEADER\ViewGuiBuilder.h" />
-    <ClInclude Include="src\VIEW\HEADER\ViewGuiBuilderInterface.h" />
+    <ClInclude Include="src\header\ControlConnectionManager.h" />
+    <ClInclude Include="src\header\ControlExceptionManager.h" />
+    <ClInclude Include="src\header\ControlMain.h" />
+    <ClInclude Include="src\header\ControlMainEventsInterface.h" />
+    <ClInclude Include="src\header\ExceptionContainer.h" />
+    <ClInclude Include="src\header\InnerConfig.h" />
+    <ClInclude Include="src\header\ModelConnection.h" />
+    <ClInclude Include="src\header\ModelConnectionInterface.h" />
+    <ClInclude Include="src\header\ModelDAO.h" />
+    <ClInclude Include="src\header\ModelDAOInterface.h" />
+    <ClInclude Include="src\header\ViewFileListManager.h" />
+    <ClInclude Include="src\header\ViewGuiBuilder.h" />
+    <ClInclude Include="src\header\ViewGuiBuilderInterface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

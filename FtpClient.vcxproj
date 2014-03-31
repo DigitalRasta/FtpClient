@@ -95,7 +95,6 @@
     <ClCompile Include="src\definition\ControlConnectionManager.cpp" />
     <ClCompile Include="src\definition\ControlExceptionManager.cpp" />
     <ClCompile Include="src\definition\ControlMain.cpp" />
-    <ClCompile Include="src\definition\ExceptionContainer.cpp" />
     <ClCompile Include="src\definition\ModelConnection.cpp" />
     <ClCompile Include="src\definition\ModelDAO.cpp" />
     <ClCompile Include="src\definition\startFile.cpp" />
@@ -113,11 +112,12 @@
     <ClInclude Include="lib\Ultimate TCP-IP\ut_clnt.h" />
     <ClInclude Include="lib\Ultimate TCP-IP\UT_Queue.h" />
     <ClInclude Include="lib\Ultimate TCP-IP\ut_strop.h" />
+    <ClInclude Include="src\header\ContainerFileInfo.h" />
     <ClInclude Include="src\header\ControlConnectionManager.h" />
     <ClInclude Include="src\header\ControlExceptionManager.h" />
     <ClInclude Include="src\header\ControlMain.h" />
     <ClInclude Include="src\header\ControlMainEventsInterface.h" />
-    <ClInclude Include="src\header\ExceptionContainer.h" />
+    <ClInclude Include="src\header\ContainerException.h" />
     <ClInclude Include="src\header\InnerConfig.h" />
     <ClInclude Include="src\header\ModelConnection.h" />
     <ClInclude Include="src\header\ModelConnectionInterface.h" />

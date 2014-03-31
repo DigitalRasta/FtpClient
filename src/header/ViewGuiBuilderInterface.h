@@ -1,7 +1,9 @@
 #pragma once
 #include "ControlMainEventsInterface.h"
 #include <string>
-#include "ExceptionContainer.h"
+#include "ContainerException.h"
+#include "ContainerFileInfo.h"
+#include <list>
 
 
 
@@ -17,5 +19,7 @@ public:
 	virtual void destroyConnectWindow(void) = 0;
 
 	virtual void spawnExceptionWindow(std::string message, ExceptionLevel errorLevel) = 0;
+
+	virtual void showListInLocalTree(std::list<ContainerFileInfo> filesList) = 0;
 };
 

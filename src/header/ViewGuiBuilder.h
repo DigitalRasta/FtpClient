@@ -43,6 +43,13 @@ public:
 	* Destroy exceptionWindow and sets all linked variables to null
 	*/
 	virtual void destroyExceptionWindow(void);
+
+	/*
+	* INTERFACE
+	* Show files list in local tree
+	*/
+	virtual void showListInLocalTree(std::list<ContainerFileInfo> filesList);
+
 private:
 	InnerConfig* innerConfigObject;
 	ControlMainEventsInterface* controlObject;

@@ -57,9 +57,6 @@
     <ClCompile Include="src\definition\ControlMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\definition\ExceptionContainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\definition\ModelConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -98,9 +95,6 @@
     <ClInclude Include="src\header\ControlMainEventsInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\header\ExceptionContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\header\InnerConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -132,6 +126,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\header\ControlMain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\ContainerFileInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\ContainerException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

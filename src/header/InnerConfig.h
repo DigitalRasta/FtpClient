@@ -35,12 +35,16 @@ public:
 
 	std::string lang_exceptionWindowTitle;
 
+	std::string lang_filesListLocalColumnType;
 	std::string lang_filesListLocalColumnName;
 	std::string lang_filesListLocalColumnSize;
 	std::string lang_filesListLocalColumnDate;
 	std::string lang_filesListServerColumnName;
 	std::string lang_filesListServerColumnSize;
 	std::string lang_filesListServerColumnDate;
+
+
+	std::string error_directoryListing;
 
 	InnerConfig(void) {
 		view_mainWindowWidth = 800;
@@ -67,6 +71,7 @@ public:
 
 		lang_exceptionWindowTitle = std::string("Error!");
 
+		lang_filesListLocalColumnType = std::string("Type");
 		lang_filesListLocalColumnName = std::string("Name");
 		lang_filesListLocalColumnSize = std::string("Size");
 		lang_filesListLocalColumnDate = std::string("Date");
@@ -74,6 +79,9 @@ public:
 		lang_filesListServerColumnName = std::string("Name");
 		lang_filesListServerColumnSize = std::string("Size");
 		lang_filesListServerColumnDate = std::string("Date");
+
+
+		error_directoryListing = std::string("Problem with directory listing");
 	};
 	virtual ~InnerConfig(void){};
 };

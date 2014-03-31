@@ -3,6 +3,7 @@
 #include "ModelDAOInterface.h"
 #include "ViewGuiBuilderInterface.h"
 #include "InnerConfig.h"
+#include <string>
 
 namespace FtpClient {
     class ControlMain;
@@ -14,6 +15,8 @@ public:
 	ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject);
 
 	void startFtpClient(void);
+
+	void initLocalBrowser(std::string startPath);
 
 	/*
 	*Interface

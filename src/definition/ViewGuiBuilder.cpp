@@ -1,8 +1,11 @@
 #include "../header/ViewGuiBuilder.h"
 #include "../header/InnerConfig.h"
-#include "../header/ExceptionContainer.h"
+#include "../header/ContainerException.h"
+#include "../header/ContainerFileInfo.h"
+
 #include <gtk-3.0/gtk/gtk.h>
 #include <string>
+#include <list>
 
 
 using namespace FtpClient;
@@ -141,13 +144,13 @@ void ViewGuiBuilder::destroyConnectWindow(void) {
 void ViewGuiBuilder::spawnExceptionWindow(std::string message, ExceptionLevel errorLevel) {
 	GtkMessageType error;
 	switch(errorLevel) {
-	case STANDARD:
+	case FtpClient::EXCEPTIONLEVEL_STANDARD:
 		error = GTK_MESSAGE_INFO;
 		break;
-	case HIGH:
+	case FtpClient::EXCEPTIONLEVEL_HIGH:
 		error = GTK_MESSAGE_WARNING;
 		break;
-	case CRITICAL:
+	case FtpClient::EXCEPTIONLEVEL_CRITICAL:
 		error = GTK_MESSAGE_ERROR;
 		break;
 	}
@@ -167,6 +170,11 @@ void ViewGuiBuilder::destroyExceptionWindow(void) {
 		gtk_widget_destroy(this->exceptionWindow);
 		this->exceptionWindow = NULL;
 	}
+}
+
+void ViewGuiBuilder::showListInLocalTree(std::list<ContainerFileInfo> filesList) {
+	this->fileListManagetObject->showListInLocalTree(filesList);
+	gtk_widget_show_all(this->mainWindowHandler);
 }
 
 

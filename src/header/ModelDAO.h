@@ -98,6 +98,6 @@ private:
 	std::list<ModelConnection> connectionObjectList;
 	int connectionObjectListId;
 
-	ModelConnection getConnectionById(int id);
+	ModelConnection* getConnectionById(int id);
 };
 

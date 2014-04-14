@@ -100,7 +100,6 @@ public:
 		lang_filesListDirectory = std::string("Directory");
 		lang_filesListFile = std::string("File");
 
-		error_directoryListing = std::string("Problem with directory listing");
 		error_connection_unknownId = std::string("Unknown connection ID");
 
 		exception_directoryListing_inaccessible = std::string("Directory is inaccessible");

@@ -5,7 +5,6 @@
 #include "../header/ContainerFileInfo.h"
 #include "../header/InnerConfig.h"
 
-#include "F:\projekty\CPP\FtpClient\lib\Ultimate TCP-IP\ftp_c.h"
 
 #include <string>
 #include <vector>
@@ -21,9 +20,14 @@ void ControlMain::startFtpClient(void) {
 	this->viewGuiBuilderObject->bindMainWindowEvents(this);
 	this->initLocalBrowser("F:/googledrive/FB foto");
 	try {
-		this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftp.bujnyj", "Moja14Polska14");
+		this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
 	} catch (ContainerException &e) {
-		this->viewGuiBuilderObject->spawnExceptionWindow(e.message, e.level);
+		this->viewGuiBuilderObject->spawnExceptionWindow("Error", e.level);
+	}
+	try {
+		//this->viewGuiBuilderObject->showListInLocalTree(this->modelDAOObject->serverGetDirectoryContent("test", 0));
+	} catch (ContainerException &e) {
+		this->viewGuiBuilderObject->spawnExceptionWindow("Error2", e.level);
 	}
 	//this->viewGuiBuilderObject->spawnExceptionWindow("ERROR!", ExceptionLevel::EXCEPTIONLEVEL_CRITICAL);
 	//this->viewGuiBuilderObject->spawnConnectWindow();

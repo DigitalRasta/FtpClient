@@ -15,27 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lib\Ultimate TCP-IP\ftp_c.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\Ultimate TCP-IP\ut_clnt.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\Ultimate TCP-IP\UT_Queue.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\Ultimate TCP-IP\UT_StrOp.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\Ultimate TCP-IP\UTDataSource.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\Ultimate TCP-IP\utfile.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\Ultimate TCP-IP\utstrlst.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\definition\ModelDAO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,38 +39,29 @@
     <ClCompile Include="src\definition\ModelConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lib\CurlEasy.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\CurlHeader.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\CurlHttpPost.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\CurlMessage.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\CurlMulti.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\CurlShare.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\CurlVersion.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\Ultimate TCP-IP\ftp_c.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\stdafx.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\ut_clnt.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\UT_Queue.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\ut_strop.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\UTDataSource.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\UTExtErr.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\utfile.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\utstrlst.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\Ultimate TCP-IP\uterr.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\header\ControlMainEventsInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -130,6 +100,36 @@
     </ClInclude>
     <ClInclude Include="src\header\ContainerException.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlEasy.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlError.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlHeader.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlHttpPost.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlInterface.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlMessage.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlMulti.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlPair.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlShare.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CurlVersion.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

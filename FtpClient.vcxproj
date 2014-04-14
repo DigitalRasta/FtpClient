@@ -42,8 +42,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>F:\projekty\CPP\GTK\include\glib-2.0;F:\projekty\CPP\GTK\include\gtk-3.0;F:\projekty\CPP\GTK\include;F:\projekty\CPP\GTK\lib\glib-2.0\include;F:\projekty\CPP\GTK\lib\gtk-3.0;F:\projekty\CPP\GTK\lib;$(VCInstallDir)UnitTest\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\projekty\CPP\GTK\lib;$(VCInstallDir)UnitTest\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\projekty\CPP\GTK\include\glib-2.0;F:\projekty\CPP\GTK\include\gtk-3.0;F:\projekty\CPP\GTK\include;F:\projekty\CPP\GTK\lib\glib-2.0\include;F:\projekty\CPP\GTK\lib\gtk-3.0;F:\projekty\CPP\GTK\lib;$(VCInstallDir)UnitTest\include;F:\projekty\CPP\Libcurl\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\projekty\CPP\GTK\lib;$(VCInstallDir)UnitTest\lib;F:\projekty\CPP\FtpClient\lib\lib;F:\projekty\CPP\FtpClient\lib\lib\Release;F:\projekty\CPP\FtpClient\lib\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -65,6 +65,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/libpath:F:/projekty/CPP/GTK/lib.lib atk-1.0.lib cairo.lib fontconfig.lib gailutil.lib gdk-win32-3.0.lib gdk_pixbuf-2.0.lib gio-2.0.lib glib-2.0.lib gmodule-2.0.lib gobject-2.0.lib gthread-2.0.lib gtk-win32-3.0.lib pango-1.0.lib pangocairo-1.0.lib pangoft2-1.0.lib pangowin32-1.0.lib /ENTRY:mainCRTStartup
  %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>F:\projekty\CPP\Libcurl\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>curllib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,13 +87,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lib\Ultimate TCP-IP\ftp_c.cpp" />
-    <ClCompile Include="lib\Ultimate TCP-IP\UTDataSource.cpp" />
-    <ClCompile Include="lib\Ultimate TCP-IP\utfile.cpp" />
-    <ClCompile Include="lib\Ultimate TCP-IP\utstrlst.cpp" />
-    <ClCompile Include="lib\Ultimate TCP-IP\ut_clnt.cpp" />
-    <ClCompile Include="lib\Ultimate TCP-IP\UT_Queue.cpp" />
-    <ClCompile Include="lib\Ultimate TCP-IP\UT_StrOp.cpp" />
+    <ClCompile Include="lib\CurlEasy.cpp" />
+    <ClCompile Include="lib\CurlHeader.cpp" />
+    <ClCompile Include="lib\CurlHttpPost.cpp" />
+    <ClCompile Include="lib\CurlMessage.cpp" />
+    <ClCompile Include="lib\CurlMulti.cpp" />
+    <ClCompile Include="lib\CurlShare.cpp" />
+    <ClCompile Include="lib\CurlVersion.cpp" />
     <ClCompile Include="src\definition\ControlConnectionManager.cpp" />
     <ClCompile Include="src\definition\ControlExceptionManager.cpp" />
     <ClCompile Include="src\definition\ControlMain.cpp" />
@@ -102,16 +104,16 @@
     <ClCompile Include="src\definition\ViewGuiBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\Ultimate TCP-IP\ftp_c.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\stdafx.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\UTDataSource.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\uterr.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\UTExtErr.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\utfile.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\utstrlst.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\ut_clnt.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\UT_Queue.h" />
-    <ClInclude Include="lib\Ultimate TCP-IP\ut_strop.h" />
+    <ClInclude Include="lib\CurlEasy.h" />
+    <ClInclude Include="lib\CurlError.h" />
+    <ClInclude Include="lib\CurlHeader.h" />
+    <ClInclude Include="lib\CurlHttpPost.h" />
+    <ClInclude Include="lib\CurlInterface.h" />
+    <ClInclude Include="lib\CurlMessage.h" />
+    <ClInclude Include="lib\CurlMulti.h" />
+    <ClInclude Include="lib\CurlPair.h" />
+    <ClInclude Include="lib\CurlShare.h" />
+    <ClInclude Include="lib\CurlVersion.h" />
     <ClInclude Include="src\header\ContainerFileInfo.h" />
     <ClInclude Include="src\header\ControlConnectionManager.h" />
     <ClInclude Include="src\header\ControlExceptionManager.h" />

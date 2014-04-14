@@ -39,7 +39,8 @@ public:
 	}
 
 	//Standard constructor
-	ContainerFileInfo(std::string dirPath, std::string name, uint64_t fileSize, bool isDir, int day, int month, int year, int hour, int minute, int attr = -1) {
+	ContainerFileInfo(std::string dirPath, std::string name, uint64_t fileSize, bool isDir, int day,
+		int month, int year, int hour, int minute, int attr = -1) {
 		this->fileName = name;
 		this->filePath = dirPath;
 		this->isDir = isDir;

@@ -60,7 +60,7 @@ std::list<ContainerFileInfo> ModelDAO::getDirectoryContent(std::string pathOrg) 
 	std::string path = pathOrg + "*"; //add for all files listing
 	searchHandle = FindFirstFileA(path.c_str(), &result);
 	if(searchHandle == INVALID_HANDLE_VALUE) { //cannot read directory content
-		throw ContainerException(this->innerConfigObject->error_directoryListing, FtpClient::EXCEPTIONLEVEL_STANDARD, FtpClient::ERROR_DIRECTORY_LISTING);
+		throw ContainerException(FtpClient::EXCEPTIONLEVEL_STANDARD, FtpClient::ERROR_DIRECTORY_LISTING);
 	}
 	do {
 		ContainerFileInfo fileToPush;
@@ -124,7 +124,7 @@ std::string ModelDAO::goUpInDirPath(std::string path) {
 
 int ModelDAO::createNewConnection(std::string host, std::string port, std::string login, std::string password) {
 	if(this->connectionObjectList.size() == this->innerConfigObject->model_maxNumberOfConnections) {
-		throw ContainerException(this->innerConfigObject->exception_connection_tooManyConnections, ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::EXCEPTION_CONNECTION_TOO_MANY);
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::EXCEPTION_CONNECTION_TOO_MANY);
 	}
 	try {
 		this->connectionObjectList.push_back(ModelConnection(host, port, login, password, this->connectionObjectListId, this->innerConfigObject));
@@ -137,10 +137,14 @@ int ModelDAO::createNewConnection(std::string host, std::string port, std::strin
 
 std::list<ContainerFileInfo> ModelDAO::serverGetDirectoryContent(std::string path, int connectionID) {
 	if(this->connectionObjectList.size() == 0) {
-		throw ContainerException(this->innerConfigObject->error_connection_unknownId, ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_DIRECTORY_LISTING);
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_DIRECTORY_LISTING);
 	}
 	ModelConnection* connection = this->getConnectionById(connectionID);
-
+	try {
+		return connection->getDirectoryContent();
+	} catch (ContainerException &e) {
+		throw;
+	}
 }
 
 

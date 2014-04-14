@@ -15,7 +15,7 @@ void ControlExceptionManager::manageException(ContainerException &e) {
 	case ExceptionLevel::EXCEPTIONLEVEL_STANDARD :
 		switch(e.code) {
 		case ExceptionCode::ERROR_DIRECTORY_LISTING :
-			this->viewGuiBuilderObject->spawnExceptionWindow(e.message + "\n" + this->innerConfigObject->exception_directoryListing_inaccessible, e.level);
+			this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_directoryListing_inaccessible, e.level);
 			break;
 		case ExceptionCode::EXCEPTION_CONNECTION_CONNECT_FAILED :
 			//TODO

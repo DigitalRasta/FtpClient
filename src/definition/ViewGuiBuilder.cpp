@@ -12,7 +12,7 @@ using namespace FtpClient;
 ViewGuiBuilder::ViewGuiBuilder(InnerConfig* innerConfigObject): innerConfigObject(innerConfigObject){
 	this->connectWindow = NULL;
 	this->exceptionWindow = NULL;
-	this->fileListManagetObject = new ViewFileListManager(this->innerConfigObject);
+	this->fileListManagerObject = new ViewFileListManager(this->innerConfigObject);
 }
 
 	/*START
@@ -20,6 +20,7 @@ ViewGuiBuilder::ViewGuiBuilder(InnerConfig* innerConfigObject): innerConfigObjec
 	*/
 void ViewGuiBuilder::initializeMainWindow(void) {
 	this->mainWindowHandler = gtk_window_new(GTK_WINDOW_TOPLEVEL);  
+	gtk_window_set_icon_from_file(GTK_WINDOW(this->mainWindowHandler), "img/icon.png", NULL);
 	gtk_window_set_title(GTK_WINDOW(this->mainWindowHandler), this->innerConfigObject->lang_mainWindowTitle.c_str());
 	gtk_widget_set_size_request(GTK_WIDGET(this->mainWindowHandler), this->innerConfigObject->view_mainWindowWidth, this->innerConfigObject->view_mainWindowHeight);
 	gtk_window_set_position(GTK_WINDOW(this->mainWindowHandler), GTK_WIN_POS_CENTER);
@@ -29,11 +30,13 @@ void ViewGuiBuilder::initializeMainWindow(void) {
 	g_signal_connect(G_OBJECT(this->mainWindowHandler), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
 	this->layoutManager = gtk_grid_new();
-	gtk_grid_set_column_homogeneous (GTK_GRID(this->layoutManager), FALSE);
-	this->buildInterface();
-	gtk_container_add(GTK_CONTAINER(this->mainWindowHandler), this->layoutManager);
 	gtk_grid_set_row_spacing(GTK_GRID(this->layoutManager), 20);
 	gtk_grid_set_column_spacing(GTK_GRID(this->layoutManager), 20);
+	gtk_grid_set_column_homogeneous (GTK_GRID(this->layoutManager), FALSE);
+	gtk_container_add(GTK_CONTAINER(this->mainWindowHandler), this->layoutManager);
+
+	this->buildInterface();
+
 	gtk_widget_show_all(this->mainWindowHandler);
 	
 }
@@ -44,11 +47,12 @@ void ViewGuiBuilder::buildInterface(void) {
 	gtk_menu_shell_append(GTK_MENU_SHELL(this->menuBar), menuItemButtonConnect);
 	gtk_widget_set_hexpand(this->menuBar, TRUE);
 	gtk_grid_attach(GTK_GRID(this->layoutManager), this->menuBar,0,0,3,1);
-	gtk_grid_attach(GTK_GRID(this->layoutManager), this->fileListManagetObject->createFilesListServer(),0,1,1,1);
-	gtk_grid_attach(GTK_GRID(this->layoutManager), this->fileListManagetObject->createFilesListLocal(),2,1,1,1);
+	gtk_grid_attach(GTK_GRID(this->layoutManager), this->fileListManagerObject->createFilesListServer(),0,1,1,1);
+	gtk_grid_attach(GTK_GRID(this->layoutManager), this->fileListManagerObject->createFilesListLocal(),2,1,1,1);
 
 	
 	g_signal_connect(menuItemButtonConnect, "activate", G_CALLBACK(this->mainWindowMenuBarButtonConnectClicked), this);
+	g_signal_connect(this->fileListManagerObject->getLocalTreeHandler(), "row-activated", G_CALLBACK(this->localTreeRowDoubleClick), this);
 
 }
 
@@ -173,8 +177,17 @@ void ViewGuiBuilder::destroyExceptionWindow(void) {
 }
 
 void ViewGuiBuilder::showListInLocalTree(std::list<ContainerFileInfo> filesList) {
-	this->fileListManagetObject->showListInLocalTree(filesList);
+	this->fileListManagerObject->showListInLocalTree(filesList);
 	gtk_widget_show_all(this->mainWindowHandler);
+}
+
+void ViewGuiBuilder::localTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	GtkTreeModel *model;
+    GtkTreeIter   iter;
+	std::string cellName = object->fileListManagerObject->getNameFromClickedCell(treeview, path);
+	object->controlObject->localTreeCellDoubleClick(cellName);
+	
 }
 
 

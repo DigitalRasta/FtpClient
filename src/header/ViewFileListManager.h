@@ -3,6 +3,7 @@
 #include "InnerConfig.h"
 #include "ContainerFileInfo.h"
 #include <list>
+#include <string>
 
 namespace FtpClient {
     class ViewFileListManager;
@@ -36,6 +37,10 @@ public:
 	*/
 	void showListInLocalTree(std::list<ContainerFileInfo> filesList);
 
+	GtkWidget* getLocalTreeHandler();
+
+	std::string getNameFromClickedCell(GtkTreeView *treeview, GtkTreePath *path);
+
 private:
 	std::string getDateToView(ContainerFileInfo file);
 	std::string getSizeToView(ContainerFileInfo file);
@@ -58,6 +63,11 @@ private:
 	GtkTreeViewColumn* localColumnName;
 	GtkTreeViewColumn* localColumnDate;
 	GtkTreeViewColumn* localColumnSize;
+
+	int localColumnIconNumber;
+	int localColumnNameNumber;
+	int localColumnDateNumber;
+	int localColumnSizeNumber;
 
 	GtkCellRenderer* localRenderIcon;
 	GtkCellRenderer* localRenderName;

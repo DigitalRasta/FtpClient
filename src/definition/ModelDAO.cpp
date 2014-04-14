@@ -2,16 +2,20 @@
 #include "../header/InnerConfig.h"
 #include "../header/ContainerFileInfo.h"
 #include "../header/ContainerException.h"
+#include "../header/ModelConnection.h"
 #include <string>
 #include <vector>
 #include <sstream>
 #include <Windows.h>
 #include <list>
 #include <stdint.h>
+#include <algorithm>
 
 
 using namespace FtpClient;
 ModelDAO::ModelDAO(InnerConfig* innerConfigObject):innerConfigObject(innerConfigObject){
+	this->connectionObjectList = std::list<ModelConnection>();
+	this->connectionObjectListId = 0;
 }
 
 
@@ -46,13 +50,16 @@ std::vector<std::string> ModelDAO::convertLogicalDrives(DWORD volumesList) {
 }
 
 
-std::list<ContainerFileInfo> ModelDAO::getDirectoryContent(std::string path) {
+std::list<ContainerFileInfo> ModelDAO::getDirectoryContent(std::string pathOrg) {
 	WIN32_FIND_DATAA result;
 	HANDLE searchHandle;
 	std::list<ContainerFileInfo> listToReturn = std::list<ContainerFileInfo>();
-	path += "*"; //add for all files listing
+	if(pathOrg.back() != '/') {
+		pathOrg += "/";
+	}
+	std::string path = pathOrg + "*"; //add for all files listing
 	searchHandle = FindFirstFileA(path.c_str(), &result);
-	if(searchHandle == INVALID_HANDLE_VALUE) {
+	if(searchHandle == INVALID_HANDLE_VALUE) { //cannot read directory content
 		throw ContainerException(this->innerConfigObject->error_directoryListing, FtpClient::EXCEPTIONLEVEL_STANDARD, FtpClient::ERROR_DIRECTORY_LISTING);
 	}
 	do {
@@ -72,11 +79,78 @@ std::list<ContainerFileInfo> ModelDAO::getDirectoryContent(std::string path) {
 		int timeConversionSuccessUTC = FileTimeToLocalFileTime(&result.ftCreationTime, &timeConversionUTC); //Conversion from UTC time to local PC time
 		int timeConversionSuccess = FileTimeToSystemTime(&timeConversionUTC, &timeConversion);
 		if(timeConversionSuccess && timeConversionSuccessUTC) {
-			fileToPush = ContainerFileInfo(path, std::string(result.cFileName), fileSize, dir, timeConversion.wDay, timeConversion.wMonth, timeConversion.wYear, timeConversion.wHour, timeConversion.wMinute);
+			fileToPush = ContainerFileInfo(pathOrg, std::string(result.cFileName), fileSize, dir, timeConversion.wDay, timeConversion.wMonth, timeConversion.wYear, timeConversion.wHour, timeConversion.wMinute);
 		} else {
-			fileToPush = ContainerFileInfo(path, std::string(result.cFileName), fileSize, dir, -1, -1, -1, -1, -1);
+			fileToPush = ContainerFileInfo(pathOrg, std::string(result.cFileName), fileSize, dir, -1, -1, -1, -1, -1);
 		}
 		listToReturn.push_back(fileToPush);
 	}while(FindNextFileA(searchHandle, &result) != 0); //search whole dir
+	if((listToReturn.front()).fileName.compare("..") !=0) {
+		listToReturn.push_front(ContainerFileInfo(pathOrg, "..", -1, true, -1, -1, -1, -1, -1, -1));
+	}
 	return listToReturn;
+}
+
+std::list<ContainerFileInfo> ModelDAO::orderFilesListDirecrotiesFiles(std::list<ContainerFileInfo> listToOrder) {
+	std::list<ContainerFileInfo> directories = std::list<ContainerFileInfo>(listToOrder);
+	std::list<ContainerFileInfo> files = std::list<ContainerFileInfo>(listToOrder);
+	auto compDirs = [](ContainerFileInfo val) -> bool {return val.isDir == false;};
+	auto compFiles = [](ContainerFileInfo val) -> bool {return val.isDir == true;};
+	directories.remove_if(compDirs);
+	files.remove_if(compFiles);
+	directories.splice(directories.end(), files);
+	return directories;
+}
+
+bool ModelDAO::isPathLogicalPartition(std::string path) {
+	int occurences = std::count(path.begin(), path.end(), '/');
+	if(occurences > 1) { //path longer
+		return false;
+	} else { //path is like "F:/"
+		return true;
+	}
+}
+
+std::string ModelDAO::goUpInDirPath(std::string path) {
+	std::string cutPath = path;
+	if(path[path.size()-1] == '/') {
+		cutPath.resize(cutPath.size()-1); //cut last '/'
+	}
+	int cutPosition = cutPath.rfind('/');
+	cutPath.resize(cutPosition+1);
+	return cutPath;
+}
+
+
+int ModelDAO::createNewConnection(std::string host, std::string port, std::string login, std::string password) {
+	if(this->connectionObjectList.size() == this->innerConfigObject->model_maxNumberOfConnections) {
+		throw ContainerException(this->innerConfigObject->exception_connection_tooManyConnections, ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::EXCEPTION_CONNECTION_TOO_MANY);
+	}
+	try {
+		this->connectionObjectList.push_back(ModelConnection(host, port, login, password, this->connectionObjectListId, this->innerConfigObject));
+	} catch (ContainerException &e) {
+		throw;
+	}
+	this->connectionObjectListId++;
+	return this->connectionObjectListId;
+}
+
+std::list<ContainerFileInfo> ModelDAO::serverGetDirectoryContent(std::string path, int connectionID) {
+	if(this->connectionObjectList.size() == 0) {
+		throw ContainerException(this->innerConfigObject->error_connection_unknownId, ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_DIRECTORY_LISTING);
+	}
+	ModelConnection* connection = this->getConnectionById(connectionID);
+
+}
+
+
+ModelConnection* ModelDAO::getConnectionById(int id) {
+	if(this->connectionObjectList.size() == 0) {
+		return NULL;
+	}
+	for(std::list<ModelConnection>::iterator i = this->connectionObjectList.begin(); i != this->connectionObjectList.end(); ++i) {
+		if((*i).getId() == id) {
+			return &(*i);
+		}
+	}
 }

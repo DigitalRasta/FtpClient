@@ -50,10 +50,13 @@ public:
 	*/
 	virtual void showListInLocalTree(std::list<ContainerFileInfo> filesList);
 
+
+	
+
 private:
 	InnerConfig* innerConfigObject;
 	ControlMainEventsInterface* controlObject;
-	ViewFileListManager* fileListManagetObject;
+	ViewFileListManager* fileListManagerObject;
 
 	GtkWidget* mainWindowHandler;
 	GtkWidget* layoutManager;
@@ -113,5 +116,14 @@ private:
 	*/
 	static void exceptionWindowOkButton(GtkDialog* dialog, gint id, gpointer* data);
 
+	/*
+	*Events
+	* Callback local list double click on row
+	* Params:
+	*	object - do nothing, lib require
+	*	data - pointer casting to ViewGuiBuilder object
+	*/
+	static void localTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data);
+	
 };
 

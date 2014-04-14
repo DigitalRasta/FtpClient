@@ -101,9 +101,6 @@
     <ClInclude Include="src\header\ModelConnection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\header\ModelConnectionInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\header\ModelDAO.h">
       <Filter>Header Files</Filter>
     </ClInclude>

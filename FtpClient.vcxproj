@@ -120,7 +120,6 @@
     <ClInclude Include="src\header\ContainerException.h" />
     <ClInclude Include="src\header\InnerConfig.h" />
     <ClInclude Include="src\header\ModelConnection.h" />
-    <ClInclude Include="src\header\ModelConnectionInterface.h" />
     <ClInclude Include="src\header\ModelDAO.h" />
     <ClInclude Include="src\header\ModelDAOInterface.h" />
     <ClInclude Include="src\header\ViewFileListManager.h" />

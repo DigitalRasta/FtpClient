@@ -24,6 +24,8 @@ public:
 	std::string view_exceptionWindowIconSrcHigh;
 	std::string view_exceptionWindowIconSrcCritical;
 
+	int model_maxNumberOfConnections;
+
 	std::string lang_mainWindowTitle;
 	std::string lang_mainWindowMenuConnectButtonText;
 	std::string lang_connectWindowTitle;
@@ -42,9 +44,22 @@ public:
 	std::string lang_filesListServerColumnName;
 	std::string lang_filesListServerColumnSize;
 	std::string lang_filesListServerColumnDate;
+	std::string lang_filesListDirectory;
+	std::string lang_filesListFile;
 
 
 	std::string error_directoryListing;
+	std::string error_connection_unknownId;
+
+	std::string exception_directoryListing_inaccessible;
+	std::string exception_connection_tooManyConnections;
+	std::string exception_connection_badHostName;
+	std::string exception_connection_connectFailed;
+	std::string exception_connection_noResponse;
+	std::string exception_connection_invalidResponse;
+	std::string exception_connection_userNa;
+	std::string exception_connection_passNa;
+	std::string exception_connection_unknown;
 
 	InnerConfig(void) {
 		view_mainWindowWidth = 800;
@@ -59,6 +74,8 @@ public:
 		view_exceptionWindowIconSrcStandard = std::string("src");
 		view_exceptionWindowIconSrcHigh = std::string("src");
 		view_exceptionWindowIconSrcCritical = std::string("src");
+
+		model_maxNumberOfConnections = 8;
 
 		lang_mainWindowTitle = std::string("FtpClient - connect to your server.");
 		lang_mainWindowMenuConnectButtonText = std::string("Connect...");
@@ -80,8 +97,21 @@ public:
 		lang_filesListServerColumnSize = std::string("Size");
 		lang_filesListServerColumnDate = std::string("Date");
 
+		lang_filesListDirectory = std::string("Directory");
+		lang_filesListFile = std::string("File");
 
 		error_directoryListing = std::string("Problem with directory listing");
+		error_connection_unknownId = std::string("Unknown connection ID");
+
+		exception_directoryListing_inaccessible = std::string("Directory is inaccessible");
+		exception_connection_tooManyConnections = std::string("Too many connections");
+		exception_connection_badHostName = std::string("Wrong host name format");
+		exception_connection_connectFailed = std::string("Something went wrong. Check your firewall");
+		exception_connection_noResponse = std::string("Host not responding");
+		exception_connection_invalidResponse = std::string("Host responding but wrong");
+		exception_connection_userNa = std::string("User command not accepted");
+		exception_connection_passNa = std::string("Pass command not accepted");
+		exception_connection_unknown = std::string("Unknown connection error");
 	};
 	virtual ~InnerConfig(void){};
 };

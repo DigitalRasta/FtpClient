@@ -2,6 +2,7 @@
 #include <gtk-3.0\gtk\gtk.h>
 #include "../header/InnerConfig.h"
 #include "../header/ContainerFileInfo.h"
+#include "../header/ViewGuiBuilder.h"
 #include <list>
 #include <string>
 #include <sstream>
@@ -61,30 +62,37 @@ GtkWidget* ViewFileListManager::createFilesListLocal(void) {
 	gtk_tree_view_column_set_sizing (this->localColumnName, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
 	gtk_tree_view_column_set_sizing (this->localColumnDate, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
 	gtk_tree_view_column_set_sizing (this->localColumnSize, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
+	gtk_tree_view_column_set_resizable(this->localColumnName, TRUE);
+	gtk_tree_view_column_set_resizable(this->localColumnDate, TRUE);
+	gtk_tree_view_column_set_resizable(this->localColumnSize, TRUE);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(this->treeLocal), this->localColumnIcon);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(this->treeLocal), this->localColumnName);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(this->treeLocal), this->localColumnSize);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(this->treeLocal), this->localColumnDate);
+	this->localColumnIconNumber = 0;
+	this->localColumnNameNumber = 1;
+	this->localColumnDateNumber = 2;
+	this->localColumnSizeNumber = 3;
 	gtk_widget_set_hexpand(this->treeLocal, TRUE);
 	if(this->dirImage == NULL || this->fileImage == NULL) {
 		this->localRenderIcon = gtk_cell_renderer_text_new();
 		gtk_tree_view_column_pack_start(this->localColumnIcon, this->localRenderIcon, true);
-		gtk_tree_view_column_add_attribute(this->localColumnIcon, this->localRenderIcon, "text",0);
+		gtk_tree_view_column_add_attribute(this->localColumnIcon, this->localRenderIcon, "text",this->localColumnIconNumber);
 		gtk_tree_view_column_set_title(this->localColumnIcon, this->configObject->lang_filesListLocalColumnType.c_str());
 	} else {
 		this->localRenderIcon = gtk_cell_renderer_pixbuf_new();
 		gtk_tree_view_column_pack_start(this->localColumnIcon, this->localRenderIcon, true);
-		gtk_tree_view_column_add_attribute(this->localColumnIcon, this->localRenderIcon, "pixbuf",0);
+		gtk_tree_view_column_add_attribute(this->localColumnIcon, this->localRenderIcon, "pixbuf",this->localColumnIconNumber);
 	}
 	this->localRenderName = gtk_cell_renderer_text_new();
 	this->localRenderSize = gtk_cell_renderer_text_new();
 	this->localRenderDate = gtk_cell_renderer_text_new();
 	gtk_tree_view_column_pack_start(this->localColumnName, this->localRenderName, true);
-	gtk_tree_view_column_add_attribute(this->localColumnName, this->localRenderName, "text",1);
+	gtk_tree_view_column_add_attribute(this->localColumnName, this->localRenderName, "text",this->localColumnNameNumber);
 	gtk_tree_view_column_pack_start(this->localColumnDate, this->localRenderDate, true);
-	gtk_tree_view_column_add_attribute(this->localColumnDate, this->localRenderDate, "text",2);
+	gtk_tree_view_column_add_attribute(this->localColumnDate, this->localRenderDate, "text",this->localColumnDateNumber);
 	gtk_tree_view_column_pack_start(this->localColumnSize, this->localRenderSize, true);
-	gtk_tree_view_column_add_attribute(this->localColumnSize, this->localRenderSize, "text",3);
+	gtk_tree_view_column_add_attribute(this->localColumnSize, this->localRenderSize, "text",this->localColumnSizeNumber);
 	if(this->dirImage == NULL || this->fileImage == NULL) {
 		this->localStoreList = gtk_list_store_new(4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 	} else {
@@ -92,7 +100,11 @@ GtkWidget* ViewFileListManager::createFilesListLocal(void) {
 	}
 	gtk_tree_view_set_model(GTK_TREE_VIEW(this->treeLocal),GTK_TREE_MODEL(this->localStoreList));
 
-	return this->treeLocal;
+	GtkWidget* scroll = gtk_scrolled_window_new( NULL,NULL );
+    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scroll ),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC );
+	gtk_container_add( GTK_CONTAINER( scroll ),this->treeLocal );
+
+	return scroll;
 }
 
 void ViewFileListManager::showListInLocalTree(std::list<ContainerFileInfo> filesList) {
@@ -101,17 +113,18 @@ void ViewFileListManager::showListInLocalTree(std::list<ContainerFileInfo> files
 			gtk_list_store_append(this->localStoreList, &this->localStoreIter);
 			std::string fileDate = this->getDateToView((*i));
 			std::string fileSize = this->getSizeToView((*i));
+			gchar* fileName = g_locale_to_utf8((*i).fileName.c_str(), (*i).fileName.size(), NULL, NULL, NULL);
 			if(this->fileImage != NULL && this->dirImage != NULL) {
 				if((*i).isDir) {
-					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->dirImage,  1, (*i).fileName.c_str(), 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->dirImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
 				} else {
-					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->fileImage,  1, (*i).fileName.c_str(), 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->fileImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
 				}
 			} else {
 				if((*i).isDir) {
-					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, "Directory",  1, (*i).fileName.c_str(), 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->configObject->lang_filesListDirectory.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
 				} else {
-					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, "File",  1, (*i).fileName.c_str(), 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->configObject->lang_filesListFile.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
 				}
 			}
 	}
@@ -120,6 +133,11 @@ void ViewFileListManager::showListInLocalTree(std::list<ContainerFileInfo> files
 std::string ViewFileListManager::getDateToView(ContainerFileInfo file) {
 	std::stringstream convert;
 	std::string toReturn;
+	if(file.day == -1 || file.fileName.compare("..") == 0) {
+		convert << "-";
+		convert >> toReturn;
+		return toReturn;
+	}
 	convert << file.year << "-";
 	if(file.month < 10) {
 		convert << "0" << file.month;
@@ -151,7 +169,7 @@ std::string ViewFileListManager::getDateToView(ContainerFileInfo file) {
 std::string ViewFileListManager::getSizeToView(ContainerFileInfo file) {
 	std::stringstream convert;
 	std::string toReturn;
-	if(file.fileSize == 0) {
+	if(file.fileSize <= 0) {
 		convert << "-";
 	} else {
 		convert << file.fileSize;
@@ -159,6 +177,21 @@ std::string ViewFileListManager::getSizeToView(ContainerFileInfo file) {
 	
 	convert >> toReturn;
 	return toReturn;
+}
+
+GtkWidget* ViewFileListManager::getLocalTreeHandler(void) {
+	return this->treeLocal;
+}
+
+std::string ViewFileListManager::getNameFromClickedCell(GtkTreeView *treeview, GtkTreePath *path) {
+	GtkTreeModel * model = gtk_tree_view_get_model(treeview);
+	GtkTreeIter   iter;
+    gchar *name = 0;
+
+    if (gtk_tree_model_get_iter(model, &iter, path)){
+	   gtk_tree_model_get(model, &iter, this->localColumnNameNumber, &name, -1);
+    }
+	return std::string(name);
 }
 
 

@@ -10,38 +10,84 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <algorithm>
 using namespace FtpClient;
 
-ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject){
-
+ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject), exceptionManagerObject(viewGuiBuilderObject, innerConfigObject){
 }
 
 void ControlMain::startFtpClient(void) {
 	this->viewGuiBuilderObject->initializeMainWindow();
 	this->viewGuiBuilderObject->bindMainWindowEvents(this);
-	//this->initLocalBrowser("C:/Windows/addins");
+	this->initLocalBrowser("F:/googledrive/FB foto");
+	try {
+		this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftp.bujnyj", "Moja14Polska14");
+	} catch (ContainerException &e) {
+		this->viewGuiBuilderObject->spawnExceptionWindow(e.message, e.level);
+	}
 	//this->viewGuiBuilderObject->spawnExceptionWindow("ERROR!", ExceptionLevel::EXCEPTIONLEVEL_CRITICAL);
-	this->viewGuiBuilderObject->spawnConnectWindow();
+	//this->viewGuiBuilderObject->spawnConnectWindow();
 
-	this->modelDAOObject->getLogicalDrives();
 }
 
 
 void ControlMain::initLocalBrowser(std::string startPath) {
-	std::list<ContainerFileInfo> listToDisplay;
 	if(startPath.compare("/") == 0 || startPath.compare("\\") == 0 || startPath.compare(" ") == 0 ) {
-		listToDisplay = this->modelDAOObject->getLogicalDrives();
+		this->localFilesList = this->modelDAOObject->getLogicalDrives();
 	} else {
-		listToDisplay = this->modelDAOObject->getDirectoryContent(startPath);
+		this->localFilesList = this->modelDAOObject->getDirectoryContent(startPath);
 	}
-	//this->viewGuiBuilderObject->showListInLocalTree(listToDisplay);
+	this->localFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->localFilesList);
+	this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
 }
 
 
 
 void ControlMain::connectWindowButtonConnectClicked(std::string host, std::string port, std::string login, std::string password) {
-	CUT_FTPClient* client = new CUT_FTPClient();
-	int retcode = client->FTPConnect("Dundas.com");
+
+}
+
+void ControlMain::localTreeCellDoubleClick(std::string name) {
+	if(name.compare("..") == 0) {
+		ContainerFileInfo fileObject = this->localFilesList.front();
+		if(this->modelDAOObject->isPathLogicalPartition(fileObject.filePath)) {
+			this->localFilesList = this->modelDAOObject->getLogicalDrives();
+		} else {
+			try {
+				this->localFilesList = this->modelDAOObject->getDirectoryContent(this->modelDAOObject->goUpInDirPath(fileObject.filePath));
+			} catch (ContainerException &e) {
+				this->exceptionManagerObject.manageException(e);
+			}
+		}
+	} else {
+		ContainerFileInfo fileObject = this->localFilesList.front();
+		for (std::list<ContainerFileInfo>::iterator it=this->localFilesList.begin(); it != this->localFilesList.end(); ++it){
+			if(it->fileName.compare(name) == 0) {
+				fileObject = *it;
+				break;
+			}
+		}
+		if(fileObject.isDir) {
+			if(fileObject.filePath.size() == 2) {
+				try {
+					this->localFilesList = this->modelDAOObject->getDirectoryContent(fileObject.filePath);
+				} catch (ContainerException &e) {
+					this->exceptionManagerObject.manageException(e);
+				}
+			} else {
+				try {
+					this->localFilesList = this->modelDAOObject->getDirectoryContent((fileObject.filePath + fileObject.fileName));
+				} catch (ContainerException &e) {
+					this->exceptionManagerObject.manageException(e);
+				}
+			}
+		} else {
+			//TODO
+		}
+
+	}
+	this->localFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->localFilesList);
+	this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
 }
 
 ControlMain::~ControlMain(void){

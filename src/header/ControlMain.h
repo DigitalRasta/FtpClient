@@ -33,6 +33,6 @@ private:
 	InnerConfig* innerConfigObject;
 	ControlExceptionManager exceptionManagerObject;
 
-	std::list<ContainerFileInfo> localFilesList;
+	std::list<ContainerFileInfo>* localFilesList;
 };
 

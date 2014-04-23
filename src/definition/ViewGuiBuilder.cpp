@@ -176,8 +176,13 @@ void ViewGuiBuilder::destroyExceptionWindow(void) {
 	}
 }
 
-void ViewGuiBuilder::showListInLocalTree(std::list<ContainerFileInfo> filesList) {
+void ViewGuiBuilder::showListInLocalTree(std::list<ContainerFileInfo>* filesList) {
 	this->fileListManagerObject->showListInLocalTree(filesList);
+	gtk_widget_show_all(this->mainWindowHandler);
+}
+
+void ViewGuiBuilder::showListInServerTree(std::list<ContainerFileInfo>* filesList) {
+	this->fileListManagerObject->showListInServerTree(filesList);
 	gtk_widget_show_all(this->mainWindowHandler);
 }
 

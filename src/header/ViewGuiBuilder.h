@@ -48,8 +48,10 @@ public:
 	* INTERFACE
 	* Show files list in local tree
 	*/
-	virtual void showListInLocalTree(std::list<ContainerFileInfo> filesList);
+	virtual void showListInLocalTree(std::list<ContainerFileInfo>* filesList);
 
+
+	virtual void showListInServerTree(std::list<ContainerFileInfo>* filesList);
 
 	
 

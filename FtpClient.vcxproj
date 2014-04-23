@@ -87,13 +87,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lib\CurlEasy.cpp" />
-    <ClCompile Include="lib\CurlHeader.cpp" />
-    <ClCompile Include="lib\CurlHttpPost.cpp" />
-    <ClCompile Include="lib\CurlMessage.cpp" />
-    <ClCompile Include="lib\CurlMulti.cpp" />
-    <ClCompile Include="lib\CurlShare.cpp" />
-    <ClCompile Include="lib\CurlVersion.cpp" />
     <ClCompile Include="src\definition\ControlConnectionManager.cpp" />
     <ClCompile Include="src\definition\ControlExceptionManager.cpp" />
     <ClCompile Include="src\definition\ControlMain.cpp" />
@@ -102,18 +95,9 @@
     <ClCompile Include="src\definition\startFile.cpp" />
     <ClCompile Include="src\definition\ViewFileListManager.cpp" />
     <ClCompile Include="src\definition\ViewGuiBuilder.cpp" />
+    <ClCompile Include="src\lib\ftpparse.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\CurlEasy.h" />
-    <ClInclude Include="lib\CurlError.h" />
-    <ClInclude Include="lib\CurlHeader.h" />
-    <ClInclude Include="lib\CurlHttpPost.h" />
-    <ClInclude Include="lib\CurlInterface.h" />
-    <ClInclude Include="lib\CurlMessage.h" />
-    <ClInclude Include="lib\CurlMulti.h" />
-    <ClInclude Include="lib\CurlPair.h" />
-    <ClInclude Include="lib\CurlShare.h" />
-    <ClInclude Include="lib\CurlVersion.h" />
     <ClInclude Include="src\header\ContainerFileInfo.h" />
     <ClInclude Include="src\header\ControlConnectionManager.h" />
     <ClInclude Include="src\header\ControlExceptionManager.h" />
@@ -127,6 +111,7 @@
     <ClInclude Include="src\header\ViewFileListManager.h" />
     <ClInclude Include="src\header\ViewGuiBuilder.h" />
     <ClInclude Include="src\header\ViewGuiBuilderInterface.h" />
+    <ClInclude Include="src\lib\ftpparse.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

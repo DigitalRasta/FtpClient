@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Lib">
+      <UniqueIdentifier>{2a761bfb-f2ca-4753-aa55-73e6b59f3e9b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\definition\ModelDAO.cpp">
@@ -39,26 +42,8 @@
     <ClCompile Include="src\definition\ModelConnection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\CurlEasy.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\CurlHeader.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\CurlHttpPost.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\CurlMessage.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\CurlMulti.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\CurlShare.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\CurlVersion.cpp">
-      <Filter>Resource Files</Filter>
+    <ClCompile Include="src\lib\ftpparse.cpp">
+      <Filter>Lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,35 +86,8 @@
     <ClInclude Include="src\header\ContainerException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\CurlEasy.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlError.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlHeader.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlHttpPost.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlInterface.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlMessage.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlMulti.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlPair.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlShare.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\CurlVersion.h">
-      <Filter>Resource Files</Filter>
+    <ClInclude Include="src\lib\ftpparse.h">
+      <Filter>Lib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -13,6 +13,7 @@
 using namespace FtpClient;
 
 ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject), exceptionManagerObject(viewGuiBuilderObject, innerConfigObject){
+	this->localFilesList = NULL;
 }
 
 void ControlMain::startFtpClient(void) {
@@ -25,7 +26,8 @@ void ControlMain::startFtpClient(void) {
 		this->viewGuiBuilderObject->spawnExceptionWindow("Error", e.level);
 	}
 	try {
-		//this->viewGuiBuilderObject->showListInLocalTree(this->modelDAOObject->serverGetDirectoryContent("test", 0));
+		this->viewGuiBuilderObject->showListInServerTree(this->modelDAOObject->serverGetDirectoryContent("", 0));
+		//this->viewGuiBuilderObject->showListInLocalTree();
 	} catch (ContainerException &e) {
 		this->viewGuiBuilderObject->spawnExceptionWindow("Error2", e.level);
 	}
@@ -53,10 +55,14 @@ void ControlMain::connectWindowButtonConnectClicked(std::string host, std::strin
 
 void ControlMain::localTreeCellDoubleClick(std::string name) {
 	if(name.compare("..") == 0) {
-		ContainerFileInfo fileObject = this->localFilesList.front();
+		ContainerFileInfo fileObject = (*this->localFilesList).front();
+		if(this->localFilesList != NULL) {
+			delete this->localFilesList;
+		}
 		if(this->modelDAOObject->isPathLogicalPartition(fileObject.filePath)) {
 			this->localFilesList = this->modelDAOObject->getLogicalDrives();
 		} else {
+
 			try {
 				this->localFilesList = this->modelDAOObject->getDirectoryContent(this->modelDAOObject->goUpInDirPath(fileObject.filePath));
 			} catch (ContainerException &e) {
@@ -64,14 +70,17 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 			}
 		}
 	} else {
-		ContainerFileInfo fileObject = this->localFilesList.front();
-		for (std::list<ContainerFileInfo>::iterator it=this->localFilesList.begin(); it != this->localFilesList.end(); ++it){
+		ContainerFileInfo fileObject = (*this->localFilesList).front();
+		for (std::list<ContainerFileInfo>::iterator it=(*this->localFilesList).begin(); it != (*this->localFilesList).end(); ++it){
 			if(it->fileName.compare(name) == 0) {
 				fileObject = *it;
 				break;
 			}
 		}
 		if(fileObject.isDir) {
+			if(this->localFilesList != NULL) {
+				delete this->localFilesList;
+			}
 			if(fileObject.filePath.size() == 2) {
 				try {
 					this->localFilesList = this->modelDAOObject->getDirectoryContent(fileObject.filePath);

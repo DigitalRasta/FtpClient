@@ -20,6 +20,8 @@ public:
 
 	virtual void spawnExceptionWindow(std::string message, ExceptionLevel errorLevel) = 0;
 
-	virtual void showListInLocalTree(std::list<ContainerFileInfo> filesList) = 0;
+	virtual void showListInLocalTree(std::list<ContainerFileInfo>* filesList) = 0;
+
+	virtual void showListInServerTree(std::list<ContainerFileInfo>* filesList) = 0;
 };
 

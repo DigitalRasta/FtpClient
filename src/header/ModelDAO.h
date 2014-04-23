@@ -35,7 +35,7 @@ public:
 	*		  attributes = -1
 	*		  
 	*/
-	std::list<ContainerFileInfo> getLogicalDrives(void);
+	std::list<ContainerFileInfo>* getLogicalDrives(void);
 
 	/*
 	* Convert bit representation of logical drives to letters.
@@ -51,7 +51,7 @@ public:
 	* return: Return list of files/folders in path directory
 	* throws: ContainerException if cannot read path directory
 	*/
-	std::list<ContainerFileInfo> getDirectoryContent(std::string path);
+	std::list<ContainerFileInfo>* getDirectoryContent(std::string path);
 
 	
 	/*
@@ -59,7 +59,7 @@ public:
 	* Order files list, first sorted by name directories, then sorted by name files
 	* return: Return ordered list of files/folder in path directory
 	*/
-	std::list<ContainerFileInfo> orderFilesListDirecrotiesFiles(std::list<ContainerFileInfo> listToOrder);
+	std::list<ContainerFileInfo>* orderFilesListDirecrotiesFiles(std::list<ContainerFileInfo>* listToOrder);
 
 	/*
 	* INTERFACE
@@ -91,11 +91,11 @@ public:
 	* return: Return list of files/folders in path directory
 	* throws: ContainerException if cannot list directory
 	*/
-	std::list<ContainerFileInfo> serverGetDirectoryContent(std::string path, int connectionID);
+	std::list<ContainerFileInfo>* serverGetDirectoryContent(std::string path, int connectionID);
 
 private:
 	InnerConfig* innerConfigObject;
-	std::list<ModelConnection> connectionObjectList;
+	std::list<ModelConnection*> connectionObjectList;
 	int connectionObjectListId;
 
 	ModelConnection* getConnectionById(int id);

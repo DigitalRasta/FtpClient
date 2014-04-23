@@ -35,7 +35,9 @@ public:
 	/*
 	* Show files list in local tree
 	*/
-	void showListInLocalTree(std::list<ContainerFileInfo> filesList);
+	void showListInLocalTree(std::list<ContainerFileInfo>* filesList);
+
+	void showListInServerTree(std::list<ContainerFileInfo>* filesList);
 
 	GtkWidget* getLocalTreeHandler();
 
@@ -52,12 +54,26 @@ private:
 	GdkPixbuf* dirImage;
 	GdkPixbuf* fileImage;
 
-	GtkWidget* filesListServer;
 	GtkWidget* treeLocal;
+	GtkWidget* treeServer;
 
+	GtkTreeViewColumn* serverColumnIcon;
 	GtkTreeViewColumn* serverColumnName;
 	GtkTreeViewColumn* serverColumnDate;
 	GtkTreeViewColumn* serverColumnSize;
+
+	int serverColumnIconNumber;
+	int serverColumnNameNumber;
+	int serverColumnDateNumber;
+	int serverColumnSizeNumber;
+
+	GtkCellRenderer* serverRenderIcon;
+	GtkCellRenderer* serverRenderName;
+	GtkCellRenderer* serverRenderSize;
+	GtkCellRenderer* serverRenderDate;
+
+	GtkListStore* serverStoreList;
+	GtkTreeIter serverStoreIter;
 
 	GtkTreeViewColumn* localColumnIcon;
 	GtkTreeViewColumn* localColumnName;

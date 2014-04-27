@@ -17,12 +17,13 @@ public:
 	int  hour;                   // the hour digit of the file date 
 	int  minute;                 // the minute digit of the file date 
 	bool  isDir;                 // flag if the entry is directory or a file
+	int ID;
 	int attributes;				 // file attributes
 
 	ContainerFileInfo(void) {};
 
 	//Constructor for drive letters
-	ContainerFileInfo(std::string filePath, std::string fileName) {
+	ContainerFileInfo(std::string filePath, std::string fileName, int ID) {
 		this->fileName = fileName;
 		this->filePath = filePath;
 		this->isDir = true;
@@ -35,15 +36,16 @@ public:
 		this->minute = -1;
 
 		this->attributes = -1;
-
+		this->ID = ID;
 	}
 
 	//Standard constructor
 	ContainerFileInfo(std::string dirPath, std::string name, uint64_t fileSize, bool isDir, int day,
-		int month, int year, int hour, int minute, int attr = -1) {
+		int month, int year, int hour, int minute, int ID, int attr = -1) {
 		this->fileName = name;
 		this->filePath = dirPath;
 		this->isDir = isDir;
+		this->ID = ID;
 
 		if(isDir) {
 			this->fileSize = 0;

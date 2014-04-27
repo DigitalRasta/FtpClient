@@ -26,6 +26,8 @@ public:
 
 	virtual void localTreeCellDoubleClick(std::string cellName);
 
+	virtual void serverTreeCellDoubleClick(std::string cellName);
+
 	virtual ~ControlMain(void);
 private:
 	ViewGuiBuilderInterface* viewGuiBuilderObject;
@@ -34,5 +36,7 @@ private:
 	ControlExceptionManager exceptionManagerObject;
 
 	std::list<ContainerFileInfo>* localFilesList;
+	std::list<ContainerFileInfo>* serverFilesList;
+	int currentConnectionID;
 };
 

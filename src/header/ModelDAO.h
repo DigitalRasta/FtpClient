@@ -93,6 +93,14 @@ public:
 	*/
 	std::list<ContainerFileInfo>* serverGetDirectoryContent(std::string path, int connectionID);
 
+	/*
+	* INTERFACE
+	* Check if path is server root
+	* return:
+	*		true - path is like: /
+	*		false - path is like /dir/dir/...
+	*/
+	bool isPathServerRoot(std::string path);
 private:
 	InnerConfig* innerConfigObject;
 	std::list<ModelConnection*> connectionObjectList;

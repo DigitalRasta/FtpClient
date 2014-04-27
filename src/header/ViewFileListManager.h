@@ -40,12 +40,15 @@ public:
 	void showListInServerTree(std::list<ContainerFileInfo>* filesList);
 
 	GtkWidget* getLocalTreeHandler();
+	GtkWidget* getServerTreeHandler();
 
-	std::string getNameFromClickedCell(GtkTreeView *treeview, GtkTreePath *path);
+	std::string getNameFromClickedCell(GtkTreeView *treeview, GtkTreePath *path, bool local);
 
 private:
 	std::string getDateToView(ContainerFileInfo file);
 	std::string getSizeToView(ContainerFileInfo file);
+	
+	std::string convertSpecialSigns(std::string strToConvert);
 
 
 
@@ -92,5 +95,8 @@ private:
 
 	GtkListStore* localStoreList;
 	GtkTreeIter localStoreIter;
+
+	std::list<ContainerFileInfo>* localFilesList;
+	std::list<ContainerFileInfo>* serverFilesList;
 };
 

@@ -27,7 +27,7 @@ std::list<ContainerFileInfo>* ModelDAO::getLogicalDrives(void) {
 	std::vector<std::string> drivesList =  this->convertLogicalDrives(volumesList);
 	std::list<ContainerFileInfo>* listToReturn = new std::list<ContainerFileInfo>;
 	for(unsigned int i = 0; i < drivesList.size(); i++) {
-		(*listToReturn).push_back(ContainerFileInfo(drivesList[i]+":", drivesList[i]));
+		(*listToReturn).push_back(ContainerFileInfo(drivesList[i]+":", drivesList[i], i));
 	}
 	return listToReturn;
 }
@@ -62,6 +62,7 @@ std::list<ContainerFileInfo>* ModelDAO::getDirectoryContent(std::string pathOrg)
 	if(searchHandle == INVALID_HANDLE_VALUE) { //cannot read directory content
 		throw ContainerException(FtpClient::EXCEPTIONLEVEL_STANDARD, FtpClient::ERROR_DIRECTORY_LISTING);
 	}
+	int id = 0;
 	do {
 		ContainerFileInfo fileToPush;
 		//0x2 means hidden file
@@ -79,16 +80,17 @@ std::list<ContainerFileInfo>* ModelDAO::getDirectoryContent(std::string pathOrg)
 		int timeConversionSuccessUTC = FileTimeToLocalFileTime(&result.ftCreationTime, &timeConversionUTC); //Conversion from UTC time to local PC time
 		int timeConversionSuccess = FileTimeToSystemTime(&timeConversionUTC, &timeConversion);
 		if(timeConversionSuccess && timeConversionSuccessUTC) {
-			fileToPush = ContainerFileInfo(pathOrg, std::string(result.cFileName), fileSize, dir, timeConversion.wDay, timeConversion.wMonth, timeConversion.wYear, timeConversion.wHour, timeConversion.wMinute);
+			fileToPush = ContainerFileInfo(pathOrg, std::string(result.cFileName), fileSize, dir, timeConversion.wDay, timeConversion.wMonth, timeConversion.wYear, timeConversion.wHour, timeConversion.wMinute, id);
 		} else {
-			fileToPush = ContainerFileInfo(pathOrg, std::string(result.cFileName), fileSize, dir, -1, -1, -1, -1, -1);
+			fileToPush = ContainerFileInfo(pathOrg, std::string(result.cFileName), fileSize, dir, -1, -1, -1, -1, -1, id);
 		}
 		(*listToReturn).push_back(fileToPush);
+		id++;
 	}while(FindNextFileA(searchHandle, &result) != 0); //search whole dir
 	if(((*listToReturn).front()).fileName.compare("..") !=0) {
 		(*listToReturn).push_front(ContainerFileInfo(pathOrg, "..", -1, true, -1, -1, -1, -1, -1, -1));
 	}
-	return listToReturn;
+	return this->orderFilesListDirecrotiesFiles(listToReturn);
 }
 
 std::list<ContainerFileInfo>* ModelDAO::orderFilesListDirecrotiesFiles(std::list<ContainerFileInfo>* listToOrder) {
@@ -130,11 +132,6 @@ int ModelDAO::createNewConnection(std::string host, std::string port, std::strin
 	}
 	ModelConnection* pointer = new ModelConnection(host, port, login, password, this->connectionObjectListId, this->innerConfigObject);
 	this->connectionObjectList.push_back(pointer);
-	try {
-		pointer->getDirectoryContent("");
-	} catch (ContainerException &e) {
-		throw;
-	}
 	this->connectionObjectListId++;
 	return this->connectionObjectListId-1;
 }
@@ -148,7 +145,10 @@ std::list<ContainerFileInfo>* ModelDAO::serverGetDirectoryContent(std::string pa
 		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
 	}
 	try {
-		return connection->getDirectoryContent(path);
+		std::list<ContainerFileInfo>* filesList = connection->getDirectoryContent(path);
+		filesList = this->orderFilesListDirecrotiesFiles(filesList);
+		connection->setFilesList(filesList);
+		return filesList;
 	} catch (ContainerException &e) {
 		throw;
 	}
@@ -165,4 +165,12 @@ ModelConnection* ModelDAO::getConnectionById(int id) {
 		}
 	}
 	return NULL;
+}
+
+bool ModelDAO::isPathServerRoot(std::string path) {
+	if(path.compare("/") == 0) {
+		return true;
+	} else {
+		return false;
+	}
 }

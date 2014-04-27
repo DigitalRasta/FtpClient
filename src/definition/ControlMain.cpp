@@ -21,12 +21,14 @@ void ControlMain::startFtpClient(void) {
 	this->viewGuiBuilderObject->bindMainWindowEvents(this);
 	this->initLocalBrowser("F:/googledrive/FB foto");
 	try {
-		this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
+		this->currentConnectionID = this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
 	} catch (ContainerException &e) {
 		this->viewGuiBuilderObject->spawnExceptionWindow("Error", e.level);
 	}
 	try {
-		this->viewGuiBuilderObject->showListInServerTree(this->modelDAOObject->serverGetDirectoryContent("", 0));
+		std::list<ContainerFileInfo>* filesList = this->modelDAOObject->serverGetDirectoryContent("/", this->currentConnectionID);
+		this->serverFilesList = filesList;
+		this->viewGuiBuilderObject->showListInServerTree(filesList);
 		//this->viewGuiBuilderObject->showListInLocalTree();
 	} catch (ContainerException &e) {
 		this->viewGuiBuilderObject->spawnExceptionWindow("Error2", e.level);
@@ -43,7 +45,6 @@ void ControlMain::initLocalBrowser(std::string startPath) {
 	} else {
 		this->localFilesList = this->modelDAOObject->getDirectoryContent(startPath);
 	}
-	this->localFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->localFilesList);
 	this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
 }
 
@@ -56,9 +57,6 @@ void ControlMain::connectWindowButtonConnectClicked(std::string host, std::strin
 void ControlMain::localTreeCellDoubleClick(std::string name) {
 	if(name.compare("..") == 0) {
 		ContainerFileInfo fileObject = (*this->localFilesList).front();
-		if(this->localFilesList != NULL) {
-			delete this->localFilesList;
-		}
 		if(this->modelDAOObject->isPathLogicalPartition(fileObject.filePath)) {
 			this->localFilesList = this->modelDAOObject->getLogicalDrives();
 		} else {
@@ -78,9 +76,6 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 			}
 		}
 		if(fileObject.isDir) {
-			if(this->localFilesList != NULL) {
-				delete this->localFilesList;
-			}
 			if(fileObject.filePath.size() == 2) {
 				try {
 					this->localFilesList = this->modelDAOObject->getDirectoryContent(fileObject.filePath);
@@ -101,6 +96,37 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 	}
 	this->localFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->localFilesList);
 	this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
+}
+
+
+void ControlMain::serverTreeCellDoubleClick(std::string name) {
+	if(name.compare("..") == 0) {
+		ContainerFileInfo fileObject = (*this->serverFilesList).front();
+		try {
+			this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent(this->modelDAOObject->goUpInDirPath(fileObject.filePath), this->currentConnectionID);
+		} catch (ContainerException &e) {
+			this->exceptionManagerObject.manageException(e);
+		}
+	} else {
+		ContainerFileInfo fileObject = (*this->serverFilesList).front();
+		for (std::list<ContainerFileInfo>::iterator it=(*this->serverFilesList).begin(); it != (*this->serverFilesList).end(); ++it){
+			if(it->fileName.compare(name) == 0) {
+				fileObject = *it;
+				break;
+			}
+		}
+		if(fileObject.isDir) {
+			try {
+				this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent((fileObject.filePath + fileObject.fileName + "/"), this->currentConnectionID);
+			} catch (ContainerException &e) {
+				this->exceptionManagerObject.manageException(e);
+			}
+		} else {
+			//TODO
+		}
+
+	}
+	this->viewGuiBuilderObject->showListInServerTree(this->serverFilesList);
 }
 
 ControlMain::~ControlMain(void){

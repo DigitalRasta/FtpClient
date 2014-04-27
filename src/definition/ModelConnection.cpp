@@ -14,7 +14,7 @@ ModelConnection::ModelConnection(std::string host, std::string port, std::string
 	this->libFtpObject = curl_easy_init();
 	this->ID = connectionId;
 	this->loginPass = login + ":" + password;
-	this->hostURL = "ftp://"+host+"/";
+	this->hostURL = "ftp://"+host+":"+port;
 	this->filesList = NULL;
 }
 
@@ -25,12 +25,13 @@ int ModelConnection::getId(void) {
 size_t ModelConnection::GetFilesList_response(void *ptr, size_t size, size_t nmemb, void * object){
 	char* responseResult = (char*)ptr;
 	ModelConnection * connection = (ModelConnection*) object;
-	connection->clearListAndInit();
 	std::string line;
 	bool backDotsFound = false;
+	int id = 0;
 	for(int i = 0; i < nmemb; i++) {
 		if(responseResult[i] == '\n') {
-			connection->parseLineAndAddToList(line);
+			connection->parseLineAndAddToList(line, id);
+			id++;
 			if(connection->filesList->size() > 0 && connection->filesList->back().fileName.compare("..") == 0) {
 				backDotsFound = true;
 			}
@@ -39,7 +40,7 @@ size_t ModelConnection::GetFilesList_response(void *ptr, size_t size, size_t nme
 		}
 		line.push_back(responseResult[i]);
 	}
-	if(!backDotsFound) {
+	if(!backDotsFound && connection->currentPath.compare("/") != 0) {
 		connection->filesList->push_front(ContainerFileInfo(connection->currentPath, std::string(".."), -1, true, -1, -1, -1, -1, -1, -1));
 	}
     return nmemb;
@@ -47,6 +48,7 @@ size_t ModelConnection::GetFilesList_response(void *ptr, size_t size, size_t nme
 
 std::list<ContainerFileInfo>* ModelConnection::getDirectoryContent(std::string path) {
 	this->currentPath = path;
+	this->clearListAndInit();
 	curl_easy_setopt(this->libFtpObject, CURLOPT_URL, (this->hostURL+path).c_str());
 	curl_easy_setopt(this->libFtpObject, CURLOPT_USERPWD, this->loginPass.c_str());
 	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEFUNCTION, &GetFilesList_response);
@@ -65,7 +67,7 @@ void ModelConnection::clearListAndInit() {
 	this->filesList = new std::list<ContainerFileInfo>();
 }
 
-void ModelConnection::parseLineAndAddToList(std::string line) {
+void ModelConnection::parseLineAndAddToList(std::string line, int id) {
 	if(line[line.length()-1] == '\r') {
 		line.resize(line.length()-1);
 	}
@@ -77,13 +79,16 @@ void ModelConnection::parseLineAndAddToList(std::string line) {
 	if(parseContainer.name[0] == '.') {
 		return;
 	}
+	if(parseContainer.name[0] == '.' && parseContainer.name[1] == '.' && this->currentPath.compare("/") == 0) {
+		return;
+	}
 	
 	tm* timeContainer = localtime(&parseContainer.mtime);
 	
 	if(parseContainer.flagtrycwd == 1) {
-		this->filesList->push_back(ContainerFileInfo(this->currentPath, std::string(parseContainer.name), -1, true, timeContainer->tm_mday, timeContainer->tm_mon+1, timeContainer->tm_year+1900, timeContainer->tm_hour, timeContainer->tm_min));
+		this->filesList->push_back(ContainerFileInfo(this->currentPath, std::string(parseContainer.name), -1, true, timeContainer->tm_mday, timeContainer->tm_mon+1, timeContainer->tm_year+1900, timeContainer->tm_hour, timeContainer->tm_min, id));
 	} else {
-		this->filesList->push_back(ContainerFileInfo(this->currentPath, std::string(parseContainer.name), parseContainer.size, false, timeContainer->tm_mday, timeContainer->tm_mon+1, timeContainer->tm_year+1900, timeContainer->tm_hour, timeContainer->tm_min));
+		this->filesList->push_back(ContainerFileInfo(this->currentPath, std::string(parseContainer.name), parseContainer.size, false, timeContainer->tm_mday, timeContainer->tm_mon+1, timeContainer->tm_year+1900, timeContainer->tm_hour, timeContainer->tm_min, id));
 	}
 }
 
@@ -115,6 +120,10 @@ ExceptionCode ModelConnection::translateCurlErrorCode(int code) {
 	default:
 		return ExceptionCode::ERROR_CONNECTION_LIBCURL_UNKNOWN_ERROR;
 	}
+}
+
+void ModelConnection::setFilesList(std::list<ContainerFileInfo>* list) {
+	this->filesList = list;
 }
 
 ModelConnection::~ModelConnection(void)

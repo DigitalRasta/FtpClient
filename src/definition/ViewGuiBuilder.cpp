@@ -53,7 +53,7 @@ void ViewGuiBuilder::buildInterface(void) {
 	
 	g_signal_connect(menuItemButtonConnect, "activate", G_CALLBACK(this->mainWindowMenuBarButtonConnectClicked), this);
 	g_signal_connect(this->fileListManagerObject->getLocalTreeHandler(), "row-activated", G_CALLBACK(this->localTreeRowDoubleClick), this);
-
+	g_signal_connect(this->fileListManagerObject->getServerTreeHandler(), "row-activated", G_CALLBACK(this->serverTreeRowDoubleClick), this);
 }
 
 void ViewGuiBuilder::mainWindowMenuBarButtonConnectClicked(GtkWidget* object, gpointer* data) {
@@ -190,8 +190,17 @@ void ViewGuiBuilder::localTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath 
 	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
 	GtkTreeModel *model;
     GtkTreeIter   iter;
-	std::string cellName = object->fileListManagerObject->getNameFromClickedCell(treeview, path);
+	std::string cellName = object->fileListManagerObject->getNameFromClickedCell(treeview, path, true);
 	object->controlObject->localTreeCellDoubleClick(cellName);
+	
+}
+
+void ViewGuiBuilder::serverTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	GtkTreeModel *model;
+    GtkTreeIter   iter;
+	std::string cellName = object->fileListManagerObject->getNameFromClickedCell(treeview, path, false);
+	object->controlObject->serverTreeCellDoubleClick(cellName);
 	
 }
 

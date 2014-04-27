@@ -127,5 +127,13 @@ private:
 	*/
 	static void localTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data);
 	
+	/*
+	*Events
+	* Callback server list double click on row
+	* Params:
+	*	object - do nothing, lib require
+	*	data - pointer casting to ViewGuiBuilder object
+	*/
+	static void serverTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data);
 };
 

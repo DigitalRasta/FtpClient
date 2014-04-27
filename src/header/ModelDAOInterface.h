@@ -19,6 +19,8 @@ public:
 
 	virtual bool isPathLogicalPartition(std::string path) = 0;
 
+	virtual bool isPathServerRoot(std::string path) = 0;
+
 	virtual std::string goUpInDirPath(std::string path) = 0;
 
 	virtual int createNewConnection(std::string host, std::string port, std::string login, std::string password) = 0;

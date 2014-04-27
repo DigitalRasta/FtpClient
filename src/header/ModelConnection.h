@@ -27,7 +27,9 @@ public:
 	int getId(void);
 	std::list<ContainerFileInfo>* getDirectoryContent(std::string path);
 
-	void parseLineAndAddToList(std::string line);
+	void setFilesList(std::list<ContainerFileInfo>* list);
+
+	void parseLineAndAddToList(std::string line, int id);
 	void clearListAndInit(void);
 	virtual ~ModelConnection(void);
 	static size_t GetFilesList_response(void *ptr, size_t size, size_t nmemb, void * object);

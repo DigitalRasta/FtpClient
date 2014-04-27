@@ -67,9 +67,9 @@ GtkWidget* ViewFileListManager::createFilesListServer(void) {
 	gtk_tree_view_column_pack_start(this->serverColumnSize, this->serverRenderSize, true);
 	gtk_tree_view_column_add_attribute(this->serverColumnSize, this->serverRenderSize, "text",this->serverColumnSizeNumber);
 	if(this->dirImage == NULL || this->fileImage == NULL) {
-		this->serverStoreList = gtk_list_store_new(4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+		this->serverStoreList = gtk_list_store_new(5, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
 	} else {
-		this->serverStoreList = gtk_list_store_new(4, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+		this->serverStoreList = gtk_list_store_new(5, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
 	}
 	gtk_tree_view_set_model(GTK_TREE_VIEW(this->treeServer),GTK_TREE_MODEL(this->serverStoreList));
 
@@ -126,9 +126,9 @@ GtkWidget* ViewFileListManager::createFilesListLocal(void) {
 	gtk_tree_view_column_pack_start(this->localColumnSize, this->localRenderSize, true);
 	gtk_tree_view_column_add_attribute(this->localColumnSize, this->localRenderSize, "text",this->localColumnSizeNumber);
 	if(this->dirImage == NULL || this->fileImage == NULL) {
-		this->localStoreList = gtk_list_store_new(4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+		this->localStoreList = gtk_list_store_new(5, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
 	} else {
-		this->localStoreList = gtk_list_store_new(4, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+		this->localStoreList = gtk_list_store_new(5, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
 	}
 	gtk_tree_view_set_model(GTK_TREE_VIEW(this->treeLocal),GTK_TREE_MODEL(this->localStoreList));
 
@@ -140,6 +140,7 @@ GtkWidget* ViewFileListManager::createFilesListLocal(void) {
 }
 
 void ViewFileListManager::showListInLocalTree(std::list<ContainerFileInfo>* filesList) {
+	this->localFilesList = filesList;
 	gtk_list_store_clear(this->localStoreList);
 	for(std::list<ContainerFileInfo>::const_iterator i = (*filesList).begin(); i != (*filesList).end(); i++) {
 			gtk_list_store_append(this->localStoreList, &this->localStoreIter);
@@ -148,21 +149,22 @@ void ViewFileListManager::showListInLocalTree(std::list<ContainerFileInfo>* file
 			gchar* fileName = g_locale_to_utf8((*i).fileName.c_str(), (*i).fileName.size(), NULL, NULL, NULL);
 			if(this->fileImage != NULL && this->dirImage != NULL) {
 				if((*i).isDir) {
-					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->dirImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->dirImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str(), 4, (*i).ID);
 				} else {
-					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->fileImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->fileImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str(), 4, (*i).ID);
 				}
 			} else {
 				if((*i).isDir) {
-					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->configObject->lang_filesListDirectory.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->configObject->lang_filesListDirectory.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str(), 4, (*i).ID);
 				} else {
-					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->configObject->lang_filesListFile.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->localStoreList, &this->localStoreIter,0, this->configObject->lang_filesListFile.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str(), 4, (*i).ID);
 				}
 			}
 	}
 }
 
 void ViewFileListManager::showListInServerTree(std::list<ContainerFileInfo>* filesList) {
+	this->serverFilesList = filesList;
 	gtk_list_store_clear(this->serverStoreList);
 	for(std::list<ContainerFileInfo>::const_iterator i = (*filesList).begin(); i != (*filesList).end(); i++) {
 			gtk_list_store_append(this->serverStoreList, &this->serverStoreIter);
@@ -171,15 +173,15 @@ void ViewFileListManager::showListInServerTree(std::list<ContainerFileInfo>* fil
 			gchar* fileName = g_locale_to_utf8((*i).fileName.c_str(), (*i).fileName.size(), NULL, NULL, NULL);
 			if(this->fileImage != NULL && this->dirImage != NULL) {
 				if((*i).isDir) {
-					gtk_list_store_set(this->serverStoreList, &this->serverStoreIter,0, this->dirImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->serverStoreList, &this->serverStoreIter,0, this->dirImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str(), 4, (*i).ID);
 				} else {
-					gtk_list_store_set(this->serverStoreList, &this->serverStoreIter,0, this->fileImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->serverStoreList, &this->serverStoreIter,0, this->fileImage,  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str(), 4, (*i).ID);
 				}
 			} else {
 				if((*i).isDir) {
-					gtk_list_store_set(this->serverStoreList, &this->serverStoreIter,0, this->configObject->lang_filesListDirectory.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->serverStoreList, &this->serverStoreIter,0, this->configObject->lang_filesListDirectory.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str(), 4, (*i).ID);
 				} else {
-					gtk_list_store_set(this->serverStoreList, &this->serverStoreIter,0, this->configObject->lang_filesListFile.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str());
+					gtk_list_store_set(this->serverStoreList, &this->serverStoreIter,0, this->configObject->lang_filesListFile.c_str(),  1, fileName, 2, fileDate.c_str(), 3, fileSize.c_str(), 4, (*i).ID);
 				}
 			}
 	}
@@ -237,15 +239,46 @@ GtkWidget* ViewFileListManager::getLocalTreeHandler(void) {
 	return this->treeLocal;
 }
 
-std::string ViewFileListManager::getNameFromClickedCell(GtkTreeView *treeview, GtkTreePath *path) {
+GtkWidget* ViewFileListManager::getServerTreeHandler(void) {
+	return this->treeServer;
+}
+
+std::string ViewFileListManager::getNameFromClickedCell(GtkTreeView *treeview, GtkTreePath *path, bool local) {
 	GtkTreeModel * model = gtk_tree_view_get_model(treeview);
 	GtkTreeIter   iter;
-    gchar *name = 0;
+    
+	int id = 0;
 
     if (gtk_tree_model_get_iter(model, &iter, path)){
-	   gtk_tree_model_get(model, &iter, this->localColumnNameNumber, &name, -1);
+	   gtk_tree_model_get(model, &iter, 4, &id, -1);
     }
-	return std::string(name);
+	if(local) {
+		for (std::list<ContainerFileInfo>::iterator it=this->localFilesList->begin(); it != this->localFilesList->end(); ++it) {
+			if((*it).ID == id) {
+				return (*it).fileName;
+			}
+		}
+	} else {
+		for (std::list<ContainerFileInfo>::iterator it=this->serverFilesList->begin(); it != this->serverFilesList->end(); ++it) {
+			if((*it).ID == id) {
+				return (*it).fileName;
+			}
+		}
+	}
+}
+
+std::string ViewFileListManager::convertSpecialSigns(std::string strToConvert) {
+	std::string strToReturn = std::string();
+	for(int i = 0; i < strToConvert.size(); i++) {
+		if(strToConvert[i] < 0) {
+			int newSign = -((254 + strToConvert[i]) + strToConvert[i+1]);
+			i++;
+			strToReturn.push_back((char)newSign);
+		} else {
+			strToReturn.push_back(strToConvert[i]);
+		}
+	}
+	return strToReturn;
 }
 
 

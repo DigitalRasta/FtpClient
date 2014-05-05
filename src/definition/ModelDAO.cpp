@@ -90,6 +90,7 @@ std::list<ContainerFileInfo>* ModelDAO::getDirectoryContent(std::string pathOrg)
 	if(((*listToReturn).front()).fileName.compare("..") !=0) {
 		(*listToReturn).push_front(ContainerFileInfo(pathOrg, "..", -1, true, -1, -1, -1, -1, -1, -1));
 	}
+	FindClose(searchHandle);
 	return this->orderFilesListDirecrotiesFiles(listToReturn);
 }
 
@@ -172,5 +173,14 @@ bool ModelDAO::isPathServerRoot(std::string path) {
 		return true;
 	} else {
 		return false;
+	}
+}
+
+bool ModelDAO::deleteLocalFile(ContainerFileInfo *file) {
+	std::string path = file->filePath + file->fileName;
+	if(file->isDir) {
+		return RemoveDirectoryA(path.c_str());
+	} else {
+		return DeleteFileA(path.c_str());
 	}
 }

@@ -44,11 +44,12 @@ public:
 
 	std::string getNameFromClickedCell(GtkTreeView *treeview, GtkTreePath *path, bool local);
 
+	ContainerFileInfo* getFileFromSelectedCell(GtkTreeSelection *selection, GtkTreeModel * model, GtkTreePath *path, bool local);
+
 private:
 	std::string getDateToView(ContainerFileInfo file);
 	std::string getSizeToView(ContainerFileInfo file);
 	
-	std::string convertSpecialSigns(std::string strToConvert);
 
 
 

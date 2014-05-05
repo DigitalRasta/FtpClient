@@ -13,6 +13,18 @@ public:
 	int view_mainWindowHeight;
 	
 	std::string view_mainWindowBackground;
+
+	std::string view_dirIconSrc;
+	std::string view_fileIconSrc;
+
+	std::string view_buttonDownloadActiveIconSrc;
+	std::string view_buttonDownloadInactiveIconSrc;
+	std::string view_buttonUploadActiveIconSrc;
+	std::string view_buttonUploadInactiveIconSrc;
+	std::string view_buttonDeleteActiveIconSrc;
+	std::string view_buttonDeleteInactiveIconSrc;
+	std::string view_buttonNewFolderActiveIconSrc;
+	std::string view_buttonNewFolderInactiveIconSrc;
 	
 
 	int view_connectWindowWidth;
@@ -48,6 +60,8 @@ public:
 	std::string lang_filesListDirectory;
 	std::string lang_filesListFile;
 
+	std::string lang_areYouSureWindowTitle;
+
 
 	std::string error_directoryListing;
 	std::string error_connection_unknownId;
@@ -66,6 +80,18 @@ public:
 		view_mainWindowWidth = 800;
 		view_mainWindowHeight = 500;
 		view_mainWindowBackground = "#FF0000";
+
+		view_dirIconSrc = std::string("img/dirIcon.png");
+		view_fileIconSrc = std::string("img/fileIcon.png");
+
+		view_buttonDownloadActiveIconSrc = std::string("img/arrowright_active.png");
+		view_buttonDownloadInactiveIconSrc = std::string("img/arrowright_inactive.png");
+		view_buttonUploadActiveIconSrc = std::string("img/arrowleft_active.png");
+		view_buttonUploadInactiveIconSrc = std::string("img/arrowleft_inactive.png");
+		view_buttonDeleteActiveIconSrc = std::string("img/delete_active.png");
+		view_buttonDeleteInactiveIconSrc = std::string("img/delete_inactive.png");
+		view_buttonNewFolderActiveIconSrc = std::string("img/newfolder_active.png");
+		view_buttonNewFolderInactiveIconSrc = std::string("img/newfolder_inactive.png");
 
 		view_connectWindowWidth = 200;
 		view_connectWindowHeight = 200;
@@ -101,6 +127,8 @@ public:
 
 		lang_filesListDirectory = std::string("Directory");
 		lang_filesListFile = std::string("File");
+
+		lang_areYouSureWindowTitle = std::string("Are you sure?");
 
 		error_connection_unknownId = std::string("Unknown connection ID");
 

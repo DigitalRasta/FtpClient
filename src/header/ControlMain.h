@@ -28,6 +28,10 @@ public:
 
 	virtual void serverTreeCellDoubleClick(std::string cellName);
 
+	virtual void serverDeleteButton(ContainerFileInfo* file);
+
+	virtual void localDeleteButton(ContainerFileInfo* file);
+
 	virtual ~ControlMain(void);
 private:
 	ViewGuiBuilderInterface* viewGuiBuilderObject;

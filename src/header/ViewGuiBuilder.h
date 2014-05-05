@@ -3,6 +3,7 @@
 #include "InnerConfig.h"
 #include "ControlMainEventsInterface.h"
 #include "ViewFileListManager.h"
+#include "ContainerFileInfo.h"
 #include <gtk-3.0/gtk/gtk.h>
 
 namespace FtpClient {
@@ -53,12 +54,29 @@ public:
 
 	virtual void showListInServerTree(std::list<ContainerFileInfo>* filesList);
 
+
+	virtual void activateDownloadButton();
+	virtual void deactivateDownloadButton();
+	virtual void activateUploadButton();
+	virtual void deactivateUploadButton();
+	virtual void activateDeleteButton();
+	virtual void deactivateDeleteButton();
+	virtual void activateNewFolderButton();
+	virtual void deactivateNewFolderButton();
+
+	bool spawnAreYouSureWindow();
 	
 
 private:
 	InnerConfig* innerConfigObject;
 	ControlMainEventsInterface* controlObject;
 	ViewFileListManager* fileListManagerObject;
+
+	ContainerFileInfo* serverCurrentFileSelected;
+	ContainerFileInfo* localCurrentFileSelected;
+	bool lastSelectedLocal;
+
+	bool doubleClick;
 
 	GtkWidget* mainWindowHandler;
 	GtkWidget* layoutManager;
@@ -74,10 +92,27 @@ private:
 
 	GtkWidget* exceptionWindow;
 
+	GtkWidget* buttonDownload;
+	GtkWidget* buttonUpload;
+	GtkWidget* buttonDelete;
+	GtkWidget* buttonNewFolder;
+
+	GtkWidget* buttonDownloadIconActive;
+	GtkWidget* buttonUploadIconActive;
+	GtkWidget* buttonDeleteIconActive;
+	GtkWidget* buttonNewFolderIconActive;
+
+	GtkWidget* buttonDownloadIconInactive;
+	GtkWidget* buttonUploadIconInactive;
+	GtkWidget* buttonDeleteIconInactive;
+	GtkWidget* buttonNewFolderIconInactive;
+
 	/*
 	* Build interface for main window. Create menu bar, create layout manager, spawn connect window on start, create files lists
 	*/
 	virtual void buildInterface(void);
+
+	virtual GtkWidget* createStandardButtons(void);
 
 
 
@@ -135,5 +170,16 @@ private:
 	*	data - pointer casting to ViewGuiBuilder object
 	*/
 	static void serverTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data);
+
+
+	static gboolean localTreeRowSelected (GtkTreeSelection *selection,GtkTreeModel *model,GtkTreePath *path,gboolean path_currently_selected,
+											gpointer userdata);
+
+	static gboolean serverTreeRowSelected (GtkTreeSelection *selection,GtkTreeModel *model,GtkTreePath *path,gboolean path_currently_selected,
+											gpointer userdata);
+
+
+	static void deleteButtonClicked(GtkWidget *widget, gpointer data);
+
 };
 

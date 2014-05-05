@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "ContainerFileInfo.h"
 
 namespace FtpClient {
     class ControlMainEventsInterface;
@@ -12,5 +13,9 @@ public:
 	virtual void localTreeCellDoubleClick(std::string cellName) = 0;
 
 	virtual void serverTreeCellDoubleClick(std::string cellName) = 0;
+
+	virtual void serverDeleteButton(ContainerFileInfo* file) = 0;
+
+	virtual void localDeleteButton(ContainerFileInfo* file) = 0;
 };
 

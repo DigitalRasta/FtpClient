@@ -101,6 +101,15 @@ public:
 	*		false - path is like /dir/dir/...
 	*/
 	bool isPathServerRoot(std::string path);
+
+	/*
+	* INTERFACE
+	* Delete file or directory
+	* return:
+	*		true - delete file or directory succesfull
+	*		false - error occured
+	*/
+	virtual bool deleteLocalFile(ContainerFileInfo *file);
 private:
 	InnerConfig* innerConfigObject;
 	std::list<ModelConnection*> connectionObjectList;

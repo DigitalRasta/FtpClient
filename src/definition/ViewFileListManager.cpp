@@ -12,8 +12,8 @@ using namespace FtpClient;
 
 ViewFileListManager::ViewFileListManager(InnerConfig* config){
 	this->configObject = config;
-	this->dirImage = gdk_pixbuf_new_from_file("img/dirIcon.png",NULL);
-	this->fileImage =gdk_pixbuf_new_from_file("img/fileIcon.png",NULL);
+	this->dirImage = gdk_pixbuf_new_from_file(this->configObject->view_dirIconSrc.c_str(),NULL);
+	this->fileImage = gdk_pixbuf_new_from_file(this->configObject->view_fileIconSrc.c_str(),NULL);
 }
 
 
@@ -267,18 +267,27 @@ std::string ViewFileListManager::getNameFromClickedCell(GtkTreeView *treeview, G
 	}
 }
 
-std::string ViewFileListManager::convertSpecialSigns(std::string strToConvert) {
-	std::string strToReturn = std::string();
-	for(int i = 0; i < strToConvert.size(); i++) {
-		if(strToConvert[i] < 0) {
-			int newSign = -((254 + strToConvert[i]) + strToConvert[i+1]);
-			i++;
-			strToReturn.push_back((char)newSign);
-		} else {
-			strToReturn.push_back(strToConvert[i]);
+
+ContainerFileInfo* ViewFileListManager::getFileFromSelectedCell(GtkTreeSelection *selection, GtkTreeModel * model, GtkTreePath *path, bool local) {
+	GtkTreeModel * model1;
+	GtkTreeIter   iter;
+	gtk_tree_model_get_iter(model, &iter, path);
+    
+	int id = 0;
+	gtk_tree_model_get(model, &iter, 4, &id, -1);
+
+	if(local) {
+		for (std::list<ContainerFileInfo>::iterator it=this->localFilesList->begin(); it != this->localFilesList->end(); ++it) {
+			if((*it).ID == id) {
+				return &(*it);
+			}
+		}
+	} else {
+		for (std::list<ContainerFileInfo>::iterator it=this->serverFilesList->begin(); it != this->serverFilesList->end(); ++it) {
+			if((*it).ID == id) {
+				return &(*it);
+			}
 		}
 	}
-	return strToReturn;
 }
-
 

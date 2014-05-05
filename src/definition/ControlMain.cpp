@@ -19,7 +19,7 @@ ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAO
 void ControlMain::startFtpClient(void) {
 	this->viewGuiBuilderObject->initializeMainWindow();
 	this->viewGuiBuilderObject->bindMainWindowEvents(this);
-	this->initLocalBrowser("F:/googledrive/FB foto");
+	this->initLocalBrowser("F:/test");
 	try {
 		this->currentConnectionID = this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
 	} catch (ContainerException &e) {
@@ -127,6 +127,31 @@ void ControlMain::serverTreeCellDoubleClick(std::string name) {
 
 	}
 	this->viewGuiBuilderObject->showListInServerTree(this->serverFilesList);
+}
+
+
+void ControlMain::serverDeleteButton(ContainerFileInfo* file) {
+
+}
+
+void ControlMain::localDeleteButton(ContainerFileInfo* file) {
+	if(this->viewGuiBuilderObject->spawnAreYouSureWindow()) {
+		if(this->modelDAOObject->deleteLocalFile(file)) {
+			try {
+				this->localFilesList = this->modelDAOObject->getDirectoryContent(file->filePath);
+			} catch (ContainerException &e) {
+				this->exceptionManagerObject.manageException(e);
+			}
+			this->localFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->localFilesList);
+			this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
+		} else {
+			if(file->isDir) {
+				this->viewGuiBuilderObject->spawnExceptionWindow("Directory inaccessible or not empty!", ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+			} else {
+				this->viewGuiBuilderObject->spawnExceptionWindow("You cannot delete this file!", ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+			}
+		}
+	}
 }
 
 ControlMain::~ControlMain(void){

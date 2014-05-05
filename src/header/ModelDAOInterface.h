@@ -27,5 +27,7 @@ public:
 
 	virtual std::list<ContainerFileInfo>* serverGetDirectoryContent(std::string path, int connectionID) = 0;
 
+	virtual bool deleteLocalFile(ContainerFileInfo *file) = 0;
+
 };
 

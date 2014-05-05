@@ -23,5 +23,16 @@ public:
 	virtual void showListInLocalTree(std::list<ContainerFileInfo>* filesList) = 0;
 
 	virtual void showListInServerTree(std::list<ContainerFileInfo>* filesList) = 0;
+
+	virtual void activateDownloadButton() = 0;
+	virtual void deactivateDownloadButton() = 0;
+	virtual void activateUploadButton() = 0;
+	virtual void deactivateUploadButton() = 0;
+	virtual void activateDeleteButton() = 0;
+	virtual void deactivateDeleteButton() = 0;
+	virtual void activateNewFolderButton() = 0;
+	virtual void deactivateNewFolderButton() = 0;
+
+	virtual bool spawnAreYouSureWindow() = 0;
 };
 

@@ -131,28 +131,85 @@ void ControlMain::serverTreeCellDoubleClick(std::string name) {
 
 
 void ControlMain::serverDeleteButton(ContainerFileInfo* file) {
-
-}
-
-void ControlMain::localDeleteButton(ContainerFileInfo* file) {
 	if(this->viewGuiBuilderObject->spawnAreYouSureWindow()) {
-		if(this->modelDAOObject->deleteLocalFile(file)) {
-			try {
-				this->localFilesList = this->modelDAOObject->getDirectoryContent(file->filePath);
-			} catch (ContainerException &e) {
-				this->exceptionManagerObject.manageException(e);
-			}
-			this->localFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->localFilesList);
-			this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
+		if(this->modelDAOObject->deleteServerFile(file, this->currentConnectionID)) {
+			this->refreshServerTree(file->filePath, this->currentConnectionID);
+			this->viewGuiBuilderObject->deactivateDownloadButton();
 		} else {
 			if(file->isDir) {
-				this->viewGuiBuilderObject->spawnExceptionWindow("Directory inaccessible or not empty!", ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+				this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_cannotDeleteDirectory, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
 			} else {
-				this->viewGuiBuilderObject->spawnExceptionWindow("You cannot delete this file!", ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+				this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_cannotDeleteFile, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
 			}
 		}
 	}
 }
 
+void ControlMain::localDeleteButton(ContainerFileInfo* file) {
+	if(this->viewGuiBuilderObject->spawnAreYouSureWindow()) {
+		if(this->modelDAOObject->deleteLocalFile(file)) {
+			this->refreshLocalTree(file->filePath);
+		} else {
+			if(file->isDir) {
+				this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_cannotDeleteDirectory, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+			} else {
+				this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_cannotDeleteFile, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+			}
+		}
+	}
+}
+
+void ControlMain::localNewFolderButton() {
+	std::string name = this->viewGuiBuilderObject->spawnInsertNameWindow();
+	for(int i = 0; i < name.size(); i++) {
+		if(name[i] < 0) {
+			this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_specialCharsNotSupported, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+			return;
+		}
+	}
+	bool flag = this->modelDAOObject->newFolderLocal(this->localFilesList->front().filePath+name);
+	if(flag) {
+		this->refreshLocalTree(this->localFilesList->front().filePath);
+	} else {
+		this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_cannotCreateDirectory, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+	}
+}
+
+void ControlMain::serverNewFolderButton() {
+	std::string name = this->viewGuiBuilderObject->spawnInsertNameWindow();
+	for(int i = 0; i < name.size(); i++) {
+		if(name[i] < 0) {
+			this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_specialCharsNotSupported, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+			return;
+		}
+	}
+	bool flag = this->modelDAOObject->newFolderServer(this->serverFilesList->front().filePath+name, this->currentConnectionID);
+	if(flag) {
+		this->refreshServerTree(this->serverFilesList->front().filePath, this->currentConnectionID);
+	} else {
+		this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_cannotCreateDirectory, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
+	}
+}
+
+void ControlMain::refreshLocalTree(std::string path) {
+	try {
+		this->localFilesList = this->modelDAOObject->getDirectoryContent(path);
+	} catch (ContainerException &e) {
+		this->exceptionManagerObject.manageException(e);
+	}
+	this->localFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->localFilesList);
+	this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
+}
+
+void ControlMain::refreshServerTree(std::string path, int connectionID) {
+	try {
+		this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent(path, connectionID);
+		
+	} catch (ContainerException &e) {
+		this->exceptionManagerObject.manageException(e);
+	}
+	this->serverFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->serverFilesList);
+	this->viewGuiBuilderObject->showListInServerTree(this->serverFilesList);
+}
 ControlMain::~ControlMain(void){
 }

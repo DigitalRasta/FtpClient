@@ -32,6 +32,10 @@ public:
 
 	virtual void localDeleteButton(ContainerFileInfo* file);
 
+	virtual void localNewFolderButton();
+
+	virtual void serverNewFolderButton();
+
 	virtual ~ControlMain(void);
 private:
 	ViewGuiBuilderInterface* viewGuiBuilderObject;
@@ -42,5 +46,8 @@ private:
 	std::list<ContainerFileInfo>* localFilesList;
 	std::list<ContainerFileInfo>* serverFilesList;
 	int currentConnectionID;
+
+	void refreshLocalTree(std::string path);
+	void refreshServerTree(std::string path, int connectionID);
 };
 

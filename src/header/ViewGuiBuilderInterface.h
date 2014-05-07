@@ -34,5 +34,7 @@ public:
 	virtual void deactivateNewFolderButton() = 0;
 
 	virtual bool spawnAreYouSureWindow() = 0;
+
+	virtual std::string spawnInsertNameWindow() = 0;
 };
 

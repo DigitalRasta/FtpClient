@@ -110,6 +110,20 @@ public:
 	*		false - error occured
 	*/
 	virtual bool deleteLocalFile(ContainerFileInfo *file);
+
+	/*
+	* INTERFACE
+	* Delete file or directory on server
+	* return:
+	*		true - delete file or directory succesfull
+	*		false - error occured
+	*/
+	virtual bool deleteServerFile(ContainerFileInfo *file, int connectionID);
+
+	virtual bool newFolderLocal(std::string pathWithName);
+
+	virtual bool newFolderServer(std::string pathWithName, int connectionID);
+
 private:
 	InnerConfig* innerConfigObject;
 	std::list<ModelConnection*> connectionObjectList;

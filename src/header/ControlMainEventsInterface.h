@@ -17,5 +17,9 @@ public:
 	virtual void serverDeleteButton(ContainerFileInfo* file) = 0;
 
 	virtual void localDeleteButton(ContainerFileInfo* file) = 0;
+
+	virtual void localNewFolderButton() = 0;
+
+	virtual void serverNewFolderButton() = 0;
 };
 

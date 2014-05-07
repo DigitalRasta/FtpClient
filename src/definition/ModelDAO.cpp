@@ -97,14 +97,15 @@ std::list<ContainerFileInfo>* ModelDAO::getDirectoryContent(std::string pathOrg)
 std::list<ContainerFileInfo>* ModelDAO::orderFilesListDirecrotiesFiles(std::list<ContainerFileInfo>* listToOrder) {
 	std::list<ContainerFileInfo>* directories = new std::list<ContainerFileInfo>(*listToOrder);
 	std::list<ContainerFileInfo>* files = new std::list<ContainerFileInfo>(*listToOrder);
-	delete listToOrder;
 	auto compDirs = [](ContainerFileInfo val) -> bool {return val.isDir == false;};
 	auto compFiles = [](ContainerFileInfo val) -> bool {return val.isDir == true;};
 	(*directories).remove_if(compDirs);
 	(*files).remove_if(compFiles);
 	(*directories).splice((*directories).end(), (*files));
 	delete files;
-	return directories;
+	*listToOrder = std::list<ContainerFileInfo>(*directories);
+	delete directories;
+	return listToOrder;
 }
 
 bool ModelDAO::isPathLogicalPartition(std::string path) {
@@ -183,4 +184,33 @@ bool ModelDAO::deleteLocalFile(ContainerFileInfo *file) {
 	} else {
 		return DeleteFileA(path.c_str());
 	}
+}
+
+bool ModelDAO::deleteServerFile(ContainerFileInfo *file, int connectionID) {
+	if(this->connectionObjectList.size() == 0) {
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
+	}
+	ModelConnection* connection = this->getConnectionById(connectionID);
+	if(connection == NULL) {
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
+	}
+	return connection->deleteFile(file);
+}
+
+bool ModelDAO::newFolderLocal(std::string pathWithName) {
+	if(pathWithName[2] != '/') {
+		return false;
+	}
+	return CreateDirectoryA(pathWithName.c_str(), NULL);
+}
+
+bool ModelDAO::newFolderServer(std::string pathWithName, int connectionID) {
+	if(this->connectionObjectList.size() == 0) {
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
+	}
+	ModelConnection* connection = this->getConnectionById(connectionID);
+	if(connection == NULL) {
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
+	}
+	return connection->newFolder(pathWithName);
 }

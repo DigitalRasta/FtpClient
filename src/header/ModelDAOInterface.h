@@ -29,5 +29,10 @@ public:
 
 	virtual bool deleteLocalFile(ContainerFileInfo *file) = 0;
 
+	virtual bool deleteServerFile(ContainerFileInfo *file, int connectionID) = 0;
+	
+	virtual bool newFolderLocal(std::string pathWithName) = 0;
+
+	virtual bool newFolderServer(std::string pathWithName, int connectionID) = 0;
 };
 

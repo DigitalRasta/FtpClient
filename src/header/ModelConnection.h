@@ -26,6 +26,9 @@ public:
 
 	int getId(void);
 	std::list<ContainerFileInfo>* getDirectoryContent(std::string path);
+	
+	bool deleteFile(ContainerFileInfo *file);
+	bool newFolder(std::string pathWithName);
 
 	void setFilesList(std::list<ContainerFileInfo>* list);
 

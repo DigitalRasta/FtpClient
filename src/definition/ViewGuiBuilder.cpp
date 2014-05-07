@@ -72,6 +72,7 @@ void ViewGuiBuilder::buildInterface(void) {
 	gtk_tree_selection_set_select_function(selectionLocal, this->localTreeRowSelected, this, NULL);
 
 	 g_signal_connect(this->buttonDelete, "clicked", G_CALLBACK (this->deleteButtonClicked), this);
+	 g_signal_connect(this->buttonNewFolder, "clicked", G_CALLBACK (this->newFolderButtonClicked), this);
 }
 
 void ViewGuiBuilder::mainWindowMenuBarButtonConnectClicked(GtkWidget* object, gpointer* data) {
@@ -352,6 +353,15 @@ void ViewGuiBuilder::deleteButtonClicked(GtkWidget *widget, gpointer data) {
 	}
 }
 
+void ViewGuiBuilder::newFolderButtonClicked(GtkWidget *widget, gpointer data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	if(object->lastSelectedLocal) {
+		object->controlObject->localNewFolderButton();
+	} else {
+		object->controlObject->serverNewFolderButton();
+	}
+}
+
 
 bool ViewGuiBuilder::spawnAreYouSureWindow() {
 	GtkWidget *dialog;
@@ -363,6 +373,30 @@ bool ViewGuiBuilder::spawnAreYouSureWindow() {
 	} else {
 		gtk_widget_destroy(dialog);
 		return false;
+	}
+}
+
+std::string ViewGuiBuilder::spawnInsertNameWindow() {
+	GtkWidget *dialog;
+	dialog = gtk_dialog_new_with_buttons (this->innerConfigObject->lang_insertNameWindowTitle.c_str(), GTK_WINDOW(this->mainWindowHandler), GTK_DIALOG_DESTROY_WITH_PARENT, ("OK"), GTK_RESPONSE_ACCEPT,("Cancel"),GTK_RESPONSE_REJECT,NULL);
+	gtk_widget_set_size_request(dialog, this->innerConfigObject->view_insertNameWindowWidth, this->innerConfigObject->view_insertNameWindowHeight);
+	GtkWidget* contentArea = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+	GtkWidget* layoutManager = gtk_grid_new();
+	gtk_grid_set_row_spacing(GTK_GRID(layoutManager), 20);
+	GtkWidget* label = gtk_label_new(this->innerConfigObject->lang_insertNameWindowLabel.c_str());
+	GtkWidget* nameEntry = gtk_entry_new();
+	gtk_grid_attach(GTK_GRID(layoutManager), label,0,0,1,1);
+	gtk_grid_attach(GTK_GRID(layoutManager), nameEntry,1,0,1,1);
+	gtk_container_add(GTK_CONTAINER(contentArea), layoutManager);
+	gtk_widget_show_all (dialog);
+	gint result = gtk_dialog_run (GTK_DIALOG (dialog));
+	if(result == GTK_RESPONSE_ACCEPT) {
+		std::string toReturn  = std::string(gtk_entry_get_text(GTK_ENTRY(nameEntry)));
+		gtk_widget_destroy(dialog);
+		return toReturn;
+	} else {
+		gtk_widget_destroy(dialog);
+		return std::string("");
 	}
 }
 

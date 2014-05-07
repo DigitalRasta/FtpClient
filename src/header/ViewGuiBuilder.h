@@ -65,6 +65,8 @@ public:
 	virtual void deactivateNewFolderButton();
 
 	bool spawnAreYouSureWindow();
+
+	virtual std::string spawnInsertNameWindow();
 	
 
 private:
@@ -181,5 +183,6 @@ private:
 
 	static void deleteButtonClicked(GtkWidget *widget, gpointer data);
 
+	static void newFolderButtonClicked(GtkWidget *widget, gpointer data);
 };
 

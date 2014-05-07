@@ -11,7 +11,6 @@
 using namespace FtpClient;
 
 ModelConnection::ModelConnection(std::string host, std::string port, std::string login, std::string password, int connectionId, InnerConfig* configObject){
-	this->libFtpObject = curl_easy_init();
 	this->ID = connectionId;
 	this->loginPass = login + ":" + password;
 	this->hostURL = "ftp://"+host+":"+port;
@@ -49,6 +48,7 @@ size_t ModelConnection::GetFilesList_response(void *ptr, size_t size, size_t nme
 std::list<ContainerFileInfo>* ModelConnection::getDirectoryContent(std::string path) {
 	this->currentPath = path;
 	this->clearListAndInit();
+	this->libFtpObject = curl_easy_init();
 	curl_easy_setopt(this->libFtpObject, CURLOPT_URL, (this->hostURL+path).c_str());
 	curl_easy_setopt(this->libFtpObject, CURLOPT_USERPWD, this->loginPass.c_str());
 	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEFUNCTION, &GetFilesList_response);
@@ -57,6 +57,7 @@ std::list<ContainerFileInfo>* ModelConnection::getDirectoryContent(std::string p
 	if(result != 0) {
 		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, this->translateCurlErrorCode(result));
 	}
+	curl_easy_cleanup(this->libFtpObject);
 	return this->filesList;
 }
 
@@ -79,7 +80,7 @@ void ModelConnection::parseLineAndAddToList(std::string line, int id) {
 	if(parseContainer.name[0] == '.') {
 		return;
 	}
-	if(parseContainer.name[0] == '.' && parseContainer.name[1] == '.' && this->currentPath.compare("/") == 0) {
+	if(parseContainer.name[1] == '.' && this->currentPath.compare("/") == 0) {
 		return;
 	}
 	
@@ -124,6 +125,49 @@ ExceptionCode ModelConnection::translateCurlErrorCode(int code) {
 
 void ModelConnection::setFilesList(std::list<ContainerFileInfo>* list) {
 	this->filesList = list;
+}
+
+bool ModelConnection::deleteFile(ContainerFileInfo* file) {
+	std::string path = this->currentPath;
+	std::string command;
+	this->libFtpObject = curl_easy_init();
+	curl_slist commandsList;
+	commandsList.next = NULL;
+	curl_easy_setopt(this->libFtpObject, CURLOPT_URL, (this->hostURL+path).c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_USERPWD, this->loginPass.c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_FTP_RESPONSE_TIMEOUT, 10);
+	if(file->isDir) {
+		command = "RMD " + file->filePath + file->fileName;
+		commandsList.data =  const_cast<char*>(command.c_str());
+	} else {	
+		command = "DELE " + file->filePath + file->fileName;
+		commandsList.data =  const_cast<char*>(command.c_str());
+	}	
+	curl_easy_setopt(this->libFtpObject, CURLOPT_QUOTE, &commandsList);
+	int result = curl_easy_perform(this->libFtpObject);
+	curl_easy_cleanup(this->libFtpObject);
+	if(result == 0) {
+		 return true;
+	} 
+	return false;
+}
+
+bool ModelConnection::newFolder(std::string pathWithName) {
+	std::string command = "MKD " + pathWithName;
+	this->libFtpObject = curl_easy_init();
+	curl_easy_setopt(this->libFtpObject, CURLOPT_URL, (this->hostURL+this->currentPath).c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_USERPWD, this->loginPass.c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_FTP_RESPONSE_TIMEOUT, 10);
+	curl_slist commandsList;
+	commandsList.next = NULL;
+	commandsList.data = const_cast<char*>(command.c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_QUOTE, &commandsList);
+	int result = curl_easy_perform(this->libFtpObject);
+	curl_easy_cleanup(this->libFtpObject);
+	if(result == 0) {
+		 return true;
+	} 
+	return false;
 }
 
 ModelConnection::~ModelConnection(void)

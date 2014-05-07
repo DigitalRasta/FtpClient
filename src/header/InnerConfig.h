@@ -32,6 +32,10 @@ public:
 
 	int view_exceptionWindowWidth;
 	int view_exceptionWindowHeight;
+
+	int view_insertNameWindowWidth;
+	int view_insertNameWindowHeight;
+
 	std::string view_exceptionWindowIconSrcStandard;
 	std::string view_exceptionWindowIconSrcHigh;
 	std::string view_exceptionWindowIconSrcCritical;
@@ -49,6 +53,7 @@ public:
 
 	std::string lang_exceptionWindowTitle;
 
+
 	std::string lang_filesListLocalColumnType;
 	std::string lang_filesListLocalColumnName;
 	std::string lang_filesListLocalColumnSize;
@@ -62,6 +67,8 @@ public:
 
 	std::string lang_areYouSureWindowTitle;
 
+	std::string lang_insertNameWindowTitle;
+	std::string lang_insertNameWindowLabel;
 
 	std::string error_directoryListing;
 	std::string error_connection_unknownId;
@@ -76,6 +83,11 @@ public:
 	std::string exception_connection_passNa;
 	std::string exception_connection_unknown;
 
+	std::string exception_cannotDeleteDirectory;
+	std::string exception_cannotDeleteFile;
+
+	std::string exception_specialCharsNotSupported;
+	std::string exception_cannotCreateDirectory;
 	InnerConfig(void) {
 		view_mainWindowWidth = 800;
 		view_mainWindowHeight = 500;
@@ -98,6 +110,10 @@ public:
 
 		view_exceptionWindowWidth = 400;
 		view_exceptionWindowHeight = 200;
+
+		view_insertNameWindowWidth = 220;
+		view_insertNameWindowHeight = 60;
+
 		view_exceptionWindowIconSrcStandard = std::string("src");
 		view_exceptionWindowIconSrcHigh = std::string("src");
 		view_exceptionWindowIconSrcCritical = std::string("src");
@@ -130,6 +146,9 @@ public:
 
 		lang_areYouSureWindowTitle = std::string("Are you sure?");
 
+		lang_insertNameWindowTitle = std::string("Insert name of directory");
+		lang_insertNameWindowLabel = std::string("Name: ");
+
 		error_connection_unknownId = std::string("Unknown connection ID");
 
 		exception_directoryListing_inaccessible = std::string("Directory is inaccessible");
@@ -141,6 +160,12 @@ public:
 		exception_connection_userNa = std::string("User command not accepted");
 		exception_connection_passNa = std::string("Pass command not accepted");
 		exception_connection_unknown = std::string("Unknown connection error");
+
+		exception_cannotDeleteDirectory = std::string("Directory inaccessible or not empty!");
+		exception_cannotDeleteFile = std::string("You cannot delete this file!");
+
+		exception_specialCharsNotSupported = std::string("Sorry! Special characters not supported!");
+		exception_cannotCreateDirectory = std::string("Cannot create directory");
 	};
 	virtual ~InnerConfig(void){};
 };

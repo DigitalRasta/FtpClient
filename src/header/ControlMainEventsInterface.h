@@ -21,5 +21,11 @@ public:
 	virtual void localNewFolderButton() = 0;
 
 	virtual void serverNewFolderButton() = 0;
+
+	virtual void downloadButton(ContainerFileInfo* fileServer) = 0;
+
+	virtual void uploadButton(ContainerFileInfo* fileLocal) = 0;
+
+	virtual void cancelDownload() = 0;
 };
 

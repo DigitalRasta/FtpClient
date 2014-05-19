@@ -9,6 +9,7 @@
 
 namespace FtpClient {
     class ViewGuiBuilderInterface;
+	typedef void (*fcallback)(double);
 }
 class FtpClient::ViewGuiBuilderInterface
 {
@@ -36,5 +37,10 @@ public:
 	virtual bool spawnAreYouSureWindow() = 0;
 
 	virtual std::string spawnInsertNameWindow() = 0;
+
+	virtual void spawnProgressBar() = 0;
+
+	virtual fcallback getProgressBarCallback() = 0;
+
 };
 

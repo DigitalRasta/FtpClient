@@ -10,6 +10,7 @@
 #include <vector>
 #include <list>
 #include <algorithm>
+#include <future>
 using namespace FtpClient;
 
 ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject), exceptionManagerObject(viewGuiBuilderObject, innerConfigObject){
@@ -211,5 +212,31 @@ void ControlMain::refreshServerTree(std::string path, int connectionID) {
 	this->serverFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->serverFilesList);
 	this->viewGuiBuilderObject->showListInServerTree(this->serverFilesList);
 }
+
+void ControlMain::downloadButton(ContainerFileInfo* fileServer) {
+	this->viewGuiBuilderObject->spawnProgressBar();
+	fcallback progressCallback = this->viewGuiBuilderObject->getProgressBarCallback();
+	bool flag;
+	try {
+		flag = this->modelDAOObject->downloadFile(fileServer->filePath, this->localFilesList->front().filePath, fileServer->fileName, fileServer->fileSize, progressCallback, this->currentConnectionID);
+	} catch (ContainerException &e) {
+		progressCallback(1);
+		this->exceptionManagerObject.manageException(e);
+	}
+	std::thread execution(
+	[&] () -> void {
+		std::this_thread::sleep_for (std::chrono::seconds(5));
+	});
+	execution.detach();
+}
+
+
+void ControlMain::cancelDownload() {
+}
+
+void ControlMain::uploadButton(ContainerFileInfo* fileLocal) {
+
+}
+
 ControlMain::~ControlMain(void){
 }

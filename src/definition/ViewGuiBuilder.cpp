@@ -73,6 +73,8 @@ void ViewGuiBuilder::buildInterface(void) {
 
 	 g_signal_connect(this->buttonDelete, "clicked", G_CALLBACK (this->deleteButtonClicked), this);
 	 g_signal_connect(this->buttonNewFolder, "clicked", G_CALLBACK (this->newFolderButtonClicked), this);
+	 g_signal_connect(this->buttonDownload, "clicked", G_CALLBACK (this->downloadButtonClicked), this);
+	 g_signal_connect(this->buttonUpload, "clicked", G_CALLBACK (this->uploadButtonClicked), this);
 }
 
 void ViewGuiBuilder::mainWindowMenuBarButtonConnectClicked(GtkWidget* object, gpointer* data) {
@@ -402,3 +404,46 @@ std::string ViewGuiBuilder::spawnInsertNameWindow() {
 
 ViewGuiBuilder::~ViewGuiBuilder(void){
 }
+
+
+void ViewGuiBuilder::downloadButtonClicked(GtkWidget *widget, gpointer data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->controlObject->downloadButton(object->serverCurrentFileSelected);
+}
+
+void ViewGuiBuilder::uploadButtonClicked(GtkWidget *widget, gpointer data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->controlObject->downloadButton(object->localCurrentFileSelected);
+}
+
+void ViewGuiBuilder::spawnProgressBar() {
+	this->progressBarDialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_widget_set_size_request(this->progressBarDialog, 600, 200);
+	GtkWidget* layoutManager = gtk_grid_new();
+	gtk_grid_set_row_spacing(GTK_GRID(layoutManager), 20);
+	GtkWidget* label = gtk_label_new("Progress");
+	this->progressBarHandler = gtk_progress_bar_new();
+	gtk_widget_set_hexpand(this->progressBarHandler, TRUE);
+	gtk_grid_attach(GTK_GRID(layoutManager), label,0,0,1,1);
+	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarHandler,0,1,1,1);
+	gtk_container_add(GTK_CONTAINER(this->progressBarDialog), layoutManager);
+	gtk_widget_show_all (this->progressBarDialog);
+}
+
+fcallback ViewGuiBuilder::getProgressBarCallback() {
+	return ViewGuiBuilder::progressBarSetProgress;
+}
+
+void ViewGuiBuilder::progressBarSetProgress(double set) {
+	if(ViewGuiBuilder::progressBarDialog != NULL) {
+		if(set > 0.99) {
+			gtk_widget_destroy(ViewGuiBuilder::progressBarDialog);
+			ViewGuiBuilder::progressBarDialog = NULL;
+		} else {
+			gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ViewGuiBuilder::progressBarHandler), set);
+		}
+	}
+}
+
+GtkWidget* FtpClient::ViewGuiBuilder::progressBarDialog = NULL;
+GtkWidget* FtpClient::ViewGuiBuilder::progressBarHandler = NULL;

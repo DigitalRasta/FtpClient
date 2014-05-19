@@ -8,11 +8,15 @@
 
 namespace FtpClient {
     class ViewGuiBuilder;
+	typedef void (*fcallback)(double);
 }
 class FtpClient::ViewGuiBuilder :
 	public FtpClient::ViewGuiBuilderInterface
 {
 public:
+	static GtkWidget* progressBarHandler;
+	static GtkWidget* progressBarDialog;
+
 	ViewGuiBuilder(InnerConfig* innerConfigObject);
 	virtual ~ViewGuiBuilder(void);
 
@@ -67,8 +71,12 @@ public:
 	bool spawnAreYouSureWindow();
 
 	virtual std::string spawnInsertNameWindow();
-	
 
+	virtual void spawnProgressBar();
+
+	virtual fcallback getProgressBarCallback();
+	
+	static void progressBarSetProgress(double set);
 private:
 	InnerConfig* innerConfigObject;
 	ControlMainEventsInterface* controlObject;
@@ -184,5 +192,9 @@ private:
 	static void deleteButtonClicked(GtkWidget *widget, gpointer data);
 
 	static void newFolderButtonClicked(GtkWidget *widget, gpointer data);
+
+	static void downloadButtonClicked(GtkWidget *widget, gpointer data);
+
+	static void uploadButtonClicked(GtkWidget *widget, gpointer data);
 };
 

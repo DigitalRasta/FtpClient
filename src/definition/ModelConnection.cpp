@@ -7,6 +7,8 @@
 #include <time.h>
 #include <sstream>
 #include <list>
+#include <stdint.h>
+#include <Windows.h>
 
 using namespace FtpClient;
 
@@ -169,6 +171,47 @@ bool ModelConnection::newFolder(std::string pathWithName) {
 	} 
 	return false;
 }
+
+size_t ModelConnection::downloadFileWriteFunction(void *buffer, size_t size, size_t nmemb, void *stream){
+	struct FtpFile* out = (struct FtpFile*)stream;
+	if(!out->stream) {
+		return -1;
+	}
+	uint64_t result = fwrite(buffer, size, nmemb, out->stream);
+	out->progress += result;
+	double precent = ((double)out->progress) / ((double)out->size);
+	out->progressBarCallback(precent);
+	return result;
+}
+
+bool ModelConnection::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, fcallback progressBarCallback) {
+	this->downloadFileHandler.stream = fopen((localPath+name).c_str(), "wb");
+	if(this->downloadFileHandler.stream) {
+		fclose(this->downloadFileHandler.stream);
+	} else {
+		return false;
+	}
+	this->downloadFileHandler.stream =  fopen((localPath+name).c_str(), "ab");
+	this->downloadFileHandler.size = size;
+	this->downloadFileHandler.progress = 0;
+	this->downloadFileHandler.progressBarCallback = progressBarCallback;
+	this->libFtpObject = curl_easy_init();
+	curl_easy_setopt(this->libFtpObject, CURLOPT_URL, (this->hostURL+serverPath+name).c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_USERPWD, this->loginPass.c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_FTP_RESPONSE_TIMEOUT, 10);
+	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEFUNCTION, this->downloadFileWriteFunction);
+	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEDATA, &this->downloadFileHandler);
+	this->downloadThread = CreateThread(NULL, 0, startDownload, (void*) this, 0, NULL); 
+	return true;
+}
+
+DWORD WINAPI ModelConnection::startDownload(void* Param) {
+	ModelConnection* This = (ModelConnection*)Param;
+	return This->translateCurlErrorCode(curl_easy_perform(This->libFtpObject));
+}
+
+
+
 
 ModelConnection::~ModelConnection(void)
 {

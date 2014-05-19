@@ -2,10 +2,12 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <stdint.h>
 #include "../header/ContainerFileInfo.h"
 
 namespace FtpClient {
     class ModelDAOInterface;
+	typedef void (*fcallback)(double);
 }
 class FtpClient::ModelDAOInterface
 {
@@ -34,5 +36,8 @@ public:
 	virtual bool newFolderLocal(std::string pathWithName) = 0;
 
 	virtual bool newFolderServer(std::string pathWithName, int connectionID) = 0;
+
+	virtual bool downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, fcallback progressBarCallback, int connectionID) = 0;
+
 };
 

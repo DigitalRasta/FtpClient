@@ -88,6 +88,8 @@ public:
 
 	std::string exception_specialCharsNotSupported;
 	std::string exception_cannotCreateDirectory;
+
+	std::string exception_cannotDownloadFile;
 	InnerConfig(void) {
 		view_mainWindowWidth = 800;
 		view_mainWindowHeight = 500;
@@ -166,6 +168,8 @@ public:
 
 		exception_specialCharsNotSupported = std::string("Sorry! Special characters not supported!");
 		exception_cannotCreateDirectory = std::string("Cannot create directory");
+
+		exception_cannotDownloadFile = std::string("Sorry! Cannot download file.");
 	};
 	virtual ~InnerConfig(void){};
 };

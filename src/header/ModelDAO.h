@@ -5,11 +5,13 @@
 #include "ModelConnection.h"
 #include <string>
 #include <vector>
+#include <stdint.h>
 #include <Windows.h>
 #include <list>
 
 namespace FtpClient {
     class ModelDAO;
+	typedef void (*fcallback)(double);
 }
 class FtpClient::ModelDAO :
 	public FtpClient::ModelDAOInterface
@@ -123,6 +125,8 @@ public:
 	virtual bool newFolderLocal(std::string pathWithName);
 
 	virtual bool newFolderServer(std::string pathWithName, int connectionID);
+
+	virtual bool downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, fcallback progressBarCallback, int connectionID);
 
 private:
 	InnerConfig* innerConfigObject;

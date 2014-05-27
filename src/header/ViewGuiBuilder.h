@@ -5,6 +5,7 @@
 #include "ViewFileListManager.h"
 #include "ContainerFileInfo.h"
 #include <gtk-3.0/gtk/gtk.h>
+#include <functional>
 
 namespace FtpClient {
     class ViewGuiBuilder;
@@ -14,8 +15,6 @@ class FtpClient::ViewGuiBuilder :
 	public FtpClient::ViewGuiBuilderInterface
 {
 public:
-	static GtkWidget* progressBarHandler;
-	static GtkWidget* progressBarDialog;
 
 	ViewGuiBuilder(InnerConfig* innerConfigObject);
 	virtual ~ViewGuiBuilder(void);
@@ -74,10 +73,16 @@ public:
 
 	virtual void spawnProgressBar();
 
-	virtual fcallback getProgressBarCallback();
+	virtual std::function<void(double)> getProgressBarCallback();
 	
-	static void progressBarSetProgress(double set);
+	void progressBarSetProgress(double set);
+
+	virtual void refreshProgressBar();
 private:
+	GtkWidget* progressBarHandler;
+	GtkWidget* progressBarDialog;
+	GtkWidget* progressBarCancelButton;
+
 	InnerConfig* innerConfigObject;
 	ControlMainEventsInterface* controlObject;
 	ViewFileListManager* fileListManagerObject;
@@ -196,5 +201,9 @@ private:
 	static void downloadButtonClicked(GtkWidget *widget, gpointer data);
 
 	static void uploadButtonClicked(GtkWidget *widget, gpointer data);
+
+	static void progressBarWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data);
+
+	static void progressBarCancelButtonClicked(GtkWidget *widget, gpointer data);
 };
 

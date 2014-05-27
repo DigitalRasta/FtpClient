@@ -24,6 +24,10 @@ int main(int argc, char* argv[])
 	* Start program - all control receive controller
 	*/
 	controlMainObject->startFtpClient(); 
-	gtk_main(); 
+	while(true) {
+		gtk_main_iteration_do(TRUE);
+		controlMainObject->checkDownloadEnd();
+		controlMainObject->checkUploadEnd();
+	}
     return 0;
 }

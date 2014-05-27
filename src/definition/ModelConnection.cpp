@@ -9,19 +9,16 @@
 #include <list>
 #include <stdint.h>
 #include <Windows.h>
+#include <functional>
 
 using namespace FtpClient;
 
-ModelConnection::ModelConnection(std::string host, std::string port, std::string login, std::string password, int connectionId, InnerConfig* configObject){
-	this->ID = connectionId;
+ModelConnection::ModelConnection(std::string host, std::string port, std::string login, std::string password, InnerConfig* configObject){
 	this->loginPass = login + ":" + password;
 	this->hostURL = "ftp://"+host+":"+port;
 	this->filesList = NULL;
 }
 
-int ModelConnection::getId(void) {
-	return this->ID;
-}
 
 size_t ModelConnection::GetFilesList_response(void *ptr, size_t size, size_t nmemb, void * object){
 	char* responseResult = (char*)ptr;
@@ -184,8 +181,10 @@ size_t ModelConnection::downloadFileWriteFunction(void *buffer, size_t size, siz
 	return result;
 }
 
-bool ModelConnection::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, fcallback progressBarCallback) {
+bool ModelConnection::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback) {
+	this->endDownloadCallback = endDownloadCallback;
 	this->downloadFileHandler.stream = fopen((localPath+name).c_str(), "wb");
+	this->mainThread = GetCurrentThread();
 	if(this->downloadFileHandler.stream) {
 		fclose(this->downloadFileHandler.stream);
 	} else {
@@ -201,15 +200,41 @@ bool ModelConnection::downloadFile(std::string serverPath, std::string localPath
 	curl_easy_setopt(this->libFtpObject, CURLOPT_FTP_RESPONSE_TIMEOUT, 10);
 	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEFUNCTION, this->downloadFileWriteFunction);
 	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEDATA, &this->downloadFileHandler);
-	this->downloadThread = CreateThread(NULL, 0, startDownload, (void*) this, 0, NULL); 
+	this->downloadThread = CreateThread(NULL, 0, startDownload, (void*) this, 0, NULL);
+	this->downloadObserverThread = CreateThread(NULL, 0, checkDownloadRunning, (void*) this, 0, NULL);
 	return true;
 }
 
 DWORD WINAPI ModelConnection::startDownload(void* Param) {
 	ModelConnection* This = (ModelConnection*)Param;
-	return This->translateCurlErrorCode(curl_easy_perform(This->libFtpObject));
+	int check = curl_easy_perform(This->libFtpObject);
+	fclose(This->downloadFileHandler.stream);
+	if(check == 0) {
+		This->downloadCode = 0;
+	} else {
+		This->downloadCode = This->translateCurlErrorCode(check);
+	}
+	return 0;
 }
 
+DWORD WINAPI ModelConnection::checkDownloadRunning(void* Param) {
+	ModelConnection* This = (ModelConnection*)Param;
+	while(true) {
+		int threadResult = WaitForSingleObject(This->downloadThread, 20);
+		if(threadResult == WAIT_TIMEOUT) {
+			Sleep(100);
+		} else {
+			if(threadResult == WAIT_OBJECT_0) {
+				This->endDownloadCallback(This->downloadCode);
+				break;
+			} else {
+				This->endDownloadCallback(-1);
+				break;
+			}
+		}
+	}
+	return 0;
+}
 
 
 

@@ -269,7 +269,6 @@ std::string ViewFileListManager::getNameFromClickedCell(GtkTreeView *treeview, G
 
 
 ContainerFileInfo* ViewFileListManager::getFileFromSelectedCell(GtkTreeSelection *selection, GtkTreeModel * model, GtkTreePath *path, bool local) {
-	GtkTreeModel * model1;
 	GtkTreeIter   iter;
 	gtk_tree_model_get_iter(model, &iter, path);
     

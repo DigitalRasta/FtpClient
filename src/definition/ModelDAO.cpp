@@ -14,8 +14,7 @@
 
 using namespace FtpClient;
 ModelDAO::ModelDAO(InnerConfig* innerConfigObject):innerConfigObject(innerConfigObject){
-	this->connectionObjectList = std::list<ModelConnection*>();
-	this->connectionObjectListId = 0;
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 }
 
 
@@ -128,45 +127,19 @@ std::string ModelDAO::goUpInDirPath(std::string path) {
 }
 
 
-int ModelDAO::createNewConnection(std::string host, std::string port, std::string login, std::string password) {
-	if(this->connectionObjectList.size() == this->innerConfigObject->model_maxNumberOfConnections) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::EXCEPTION_CONNECTION_TOO_MANY);
-	}
-	ModelConnection* pointer = new ModelConnection(host, port, login, password, this->connectionObjectListId, this->innerConfigObject);
-	this->connectionObjectList.push_back(pointer);
-	this->connectionObjectListId++;
-	return this->connectionObjectListId-1;
+void ModelDAO::createNewConnection(std::string host, std::string port, std::string login, std::string password) {
+	this->connectionObject = new ModelConnection(host, port, login, password, this->innerConfigObject);
 }
 
-std::list<ContainerFileInfo>* ModelDAO::serverGetDirectoryContent(std::string path, int connectionID) {
-	if(this->connectionObjectList.size() == 0) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
-	}
-	ModelConnection* connection = this->getConnectionById(connectionID);
-	if(connection == NULL) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
-	}
+std::list<ContainerFileInfo>* ModelDAO::serverGetDirectoryContent(std::string path) {
 	try {
-		std::list<ContainerFileInfo>* filesList = connection->getDirectoryContent(path);
+		std::list<ContainerFileInfo>* filesList = this->connectionObject->getDirectoryContent(path);
 		filesList = this->orderFilesListDirecrotiesFiles(filesList);
-		connection->setFilesList(filesList);
+		this->connectionObject->setFilesList(filesList);
 		return filesList;
 	} catch (ContainerException &e) {
 		throw;
 	}
-}
-
-
-ModelConnection* ModelDAO::getConnectionById(int id) {
-	if(this->connectionObjectList.size() == 0) {
-		return NULL;
-	}
-	for(std::list<ModelConnection*>::iterator i = this->connectionObjectList.begin(); i != this->connectionObjectList.end(); ++i) {
-		if((*(*i)).getId() == id) {
-			return &(*(*i));
-		}
-	}
-	return NULL;
 }
 
 bool ModelDAO::isPathServerRoot(std::string path) {
@@ -186,15 +159,8 @@ bool ModelDAO::deleteLocalFile(ContainerFileInfo *file) {
 	}
 }
 
-bool ModelDAO::deleteServerFile(ContainerFileInfo *file, int connectionID) {
-	if(this->connectionObjectList.size() == 0) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
-	}
-	ModelConnection* connection = this->getConnectionById(connectionID);
-	if(connection == NULL) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
-	}
-	return connection->deleteFile(file);
+bool ModelDAO::deleteServerFile(ContainerFileInfo *file) {
+	return this->connectionObject->deleteFile(file);
 }
 
 bool ModelDAO::newFolderLocal(std::string pathWithName) {
@@ -204,24 +170,22 @@ bool ModelDAO::newFolderLocal(std::string pathWithName) {
 	return CreateDirectoryA(pathWithName.c_str(), NULL);
 }
 
-bool ModelDAO::newFolderServer(std::string pathWithName, int connectionID) {
-	if(this->connectionObjectList.size() == 0) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
-	}
-	ModelConnection* connection = this->getConnectionById(connectionID);
-	if(connection == NULL) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
-	}
-	return connection->newFolder(pathWithName);
+bool ModelDAO::newFolderServer(std::string pathWithName) {
+	return this->connectionObject->newFolder(pathWithName);
 }
 
-bool ModelDAO::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, fcallback progressBarCallback, int connectionID) {
-	if(this->connectionObjectList.size() == 0) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
+bool ModelDAO::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback) {
+	return this->connectionObject->downloadFile(serverPath, localPath, name, size, progressBarCallback, endDownloadCallback);
+}
+
+void ModelDAO::killDownloadThread() {
+	fclose(this->connectionObject->downloadFileHandler.stream);
+	bool flag = TerminateThread(this->connectionObject->downloadThread, 1);
+	if(!flag) {
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_THREAD_CANNOT_KILL);
 	}
-	ModelConnection* connection = this->getConnectionById(connectionID);
-	if(connection == NULL) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_CONNECTION_UNKNOWN_ID);
+	flag = TerminateThread(this->connectionObject->downloadObserverThread, 1);
+	if(!flag) {
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_THREAD_CANNOT_KILL);
 	}
-	return connection->downloadFile(serverPath, localPath, name, size, progressBarCallback);
 }

@@ -5,8 +5,7 @@
 #include "InnerConfig.h"
 #include "ControlExceptionManager.h"
 #include <string>
-#include <thread>
-#include <chrono>
+#include <functional>
 
 
 namespace FtpClient {
@@ -45,6 +44,12 @@ public:
 
 	virtual void cancelDownload();
 
+	void endDownloadCallback(int param);
+
+	void checkDownloadEnd();
+
+	void checkUploadEnd();
+
 	virtual ~ControlMain(void);
 private:
 	ViewGuiBuilderInterface* viewGuiBuilderObject;
@@ -54,12 +59,19 @@ private:
 
 	std::list<ContainerFileInfo>* localFilesList;
 	std::list<ContainerFileInfo>* serverFilesList;
-	int currentConnectionID;
-
-
 
 	void refreshLocalTree(std::string path);
-	void refreshServerTree(std::string path, int connectionID);
+	void refreshServerTree(std::string path);
+
+	void refreshProgressBar();
+
+	bool downloadEnd;
+	bool uploadEnd;
+
+	int lastDownloadCode;
+
+	ContainerFileInfo* lastFileDownload;
+
 
 };
 

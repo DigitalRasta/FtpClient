@@ -4,6 +4,7 @@
 #include "ContainerException.h"
 #include "ContainerFileInfo.h"
 #include <list>
+#include <functional>
 
 
 
@@ -40,7 +41,9 @@ public:
 
 	virtual void spawnProgressBar() = 0;
 
-	virtual fcallback getProgressBarCallback() = 0;
+	virtual std::function<void(double)> getProgressBarCallback() = 0;
+
+	virtual void refreshProgressBar() = 0;
 
 };
 

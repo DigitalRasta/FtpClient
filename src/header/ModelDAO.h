@@ -81,11 +81,10 @@ public:
 
 	/*
 	* INTERFACE
-	* Create new connection and try to connect
-	* return: ID of created connection - you need it for connection using
+	* Create new connection
 	* throws: ContainerException if cannot connect
 	*/
-	int createNewConnection(std::string host, std::string port, std::string login, std::string password);
+	void createNewConnection(std::string host, std::string port, std::string login, std::string password);
 
 	/*
 	* INTERFACE
@@ -93,7 +92,7 @@ public:
 	* return: Return list of files/folders in path directory
 	* throws: ContainerException if cannot list directory
 	*/
-	std::list<ContainerFileInfo>* serverGetDirectoryContent(std::string path, int connectionID);
+	std::list<ContainerFileInfo>* serverGetDirectoryContent(std::string path);
 
 	/*
 	* INTERFACE
@@ -120,19 +119,18 @@ public:
 	*		true - delete file or directory succesfull
 	*		false - error occured
 	*/
-	virtual bool deleteServerFile(ContainerFileInfo *file, int connectionID);
+	virtual bool deleteServerFile(ContainerFileInfo *file);
 
 	virtual bool newFolderLocal(std::string pathWithName);
 
-	virtual bool newFolderServer(std::string pathWithName, int connectionID);
+	virtual bool newFolderServer(std::string pathWithName);
 
-	virtual bool downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, fcallback progressBarCallback, int connectionID);
-
+	virtual bool downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback);
+	
+	virtual void killDownloadThread();
 private:
 	InnerConfig* innerConfigObject;
-	std::list<ModelConnection*> connectionObjectList;
-	int connectionObjectListId;
+	ModelConnection* connectionObject;
 
-	ModelConnection* getConnectionById(int id);
 };
 

@@ -12,6 +12,7 @@ using namespace FtpClient;
 ViewGuiBuilder::ViewGuiBuilder(InnerConfig* innerConfigObject): innerConfigObject(innerConfigObject){
 	this->connectWindow = NULL;
 	this->exceptionWindow = NULL;
+	this->progressBarDialog = NULL;
 	this->fileListManagerObject = new ViewFileListManager(this->innerConfigObject);
 	this->doubleClick = false;
 
@@ -291,8 +292,6 @@ void ViewGuiBuilder::deactivateNewFolderButton() {
 
 void ViewGuiBuilder::localTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data) {
 	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	GtkTreeModel *model;
-    GtkTreeIter   iter;
 	object->deactivateUploadButton();
 	object->deactivateDeleteButton();
 	object->doubleClick = true;
@@ -302,8 +301,6 @@ void ViewGuiBuilder::localTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath 
 
 void ViewGuiBuilder::serverTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data) {
 	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	GtkTreeModel *model;
-    GtkTreeIter   iter;
 	object->deactivateDownloadButton();
 	object->deactivateDeleteButton();
 	object->doubleClick = true;
@@ -417,6 +414,10 @@ void ViewGuiBuilder::uploadButtonClicked(GtkWidget *widget, gpointer data) {
 }
 
 void ViewGuiBuilder::spawnProgressBar() {
+	this->deactivateDeleteButton();
+	this->deactivateDownloadButton();
+	this->deactivateNewFolderButton();
+	this->deactivateUploadButton();
 	this->progressBarDialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_widget_set_size_request(this->progressBarDialog, 600, 200);
 	GtkWidget* layoutManager = gtk_grid_new();
@@ -424,26 +425,49 @@ void ViewGuiBuilder::spawnProgressBar() {
 	GtkWidget* label = gtk_label_new("Progress");
 	this->progressBarHandler = gtk_progress_bar_new();
 	gtk_widget_set_hexpand(this->progressBarHandler, TRUE);
-	gtk_grid_attach(GTK_GRID(layoutManager), label,0,0,1,1);
-	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarHandler,0,1,1,1);
+	this->progressBarCancelButton = gtk_button_new_with_label("Cancel");
+	gtk_grid_attach(GTK_GRID(layoutManager), label,0,0,3,1);
+	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarHandler,0,1,3,1);
+	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarCancelButton,1,2,1,1);
 	gtk_container_add(GTK_CONTAINER(this->progressBarDialog), layoutManager);
 	gtk_widget_show_all (this->progressBarDialog);
+	g_signal_connect(this->progressBarDialog, "delete-event",G_CALLBACK(this->progressBarWindowCloseButtonClicked), this);
+	g_signal_connect(this->progressBarCancelButton, "clicked",G_CALLBACK(this->progressBarCancelButtonClicked), this);
 }
 
-fcallback ViewGuiBuilder::getProgressBarCallback() {
-	return ViewGuiBuilder::progressBarSetProgress;
+std::function<void(double)> ViewGuiBuilder::getProgressBarCallback() {
+	return std::bind(&ViewGuiBuilder::progressBarSetProgress, this, std::placeholders::_1);
 }
 
 void ViewGuiBuilder::progressBarSetProgress(double set) {
-	if(ViewGuiBuilder::progressBarDialog != NULL) {
+	if(this->progressBarDialog != NULL) {
 		if(set > 0.99) {
-			gtk_widget_destroy(ViewGuiBuilder::progressBarDialog);
-			ViewGuiBuilder::progressBarDialog = NULL;
+			gtk_widget_destroy(this->progressBarDialog);
+			this->progressBarDialog = NULL;
+			this->activateDeleteButton();
+			this->activateDownloadButton();
+			this->activateNewFolderButton();
+			this->activateUploadButton();
 		} else {
-			gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(ViewGuiBuilder::progressBarHandler), set);
+			gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(this->progressBarHandler), set);
 		}
 	}
 }
 
-GtkWidget* FtpClient::ViewGuiBuilder::progressBarDialog = NULL;
-GtkWidget* FtpClient::ViewGuiBuilder::progressBarHandler = NULL;
+void ViewGuiBuilder::refreshProgressBar() {
+	if(this->progressBarDialog != NULL) {
+		gtk_widget_queue_draw(this->progressBarHandler);
+	}
+}
+
+void ViewGuiBuilder::progressBarWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data) {
+	ViewGuiBuilder* This = (ViewGuiBuilder*)data;
+	This->controlObject->cancelDownload();
+	gtk_widget_destroy(This->progressBarDialog);
+}
+
+void ViewGuiBuilder::progressBarCancelButtonClicked(GtkWidget *widget, gpointer data) {
+	ViewGuiBuilder* This = (ViewGuiBuilder*)data;
+	This->controlObject->cancelDownload();
+	gtk_widget_destroy(This->progressBarDialog);
+}

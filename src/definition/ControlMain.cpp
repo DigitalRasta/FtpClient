@@ -15,6 +15,8 @@ using namespace FtpClient;
 
 ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject), exceptionManagerObject(viewGuiBuilderObject, innerConfigObject){
 	this->localFilesList = NULL;
+	this->downloadEnd = false;
+	this->uploadEnd = false;
 }
 
 void ControlMain::startFtpClient(void) {
@@ -22,12 +24,12 @@ void ControlMain::startFtpClient(void) {
 	this->viewGuiBuilderObject->bindMainWindowEvents(this);
 	this->initLocalBrowser("F:/test");
 	try {
-		this->currentConnectionID = this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
+		this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
 	} catch (ContainerException &e) {
 		this->viewGuiBuilderObject->spawnExceptionWindow("Error", e.level);
 	}
 	try {
-		std::list<ContainerFileInfo>* filesList = this->modelDAOObject->serverGetDirectoryContent("/", this->currentConnectionID);
+		std::list<ContainerFileInfo>* filesList = this->modelDAOObject->serverGetDirectoryContent("/");
 		this->serverFilesList = filesList;
 		this->viewGuiBuilderObject->showListInServerTree(filesList);
 		//this->viewGuiBuilderObject->showListInLocalTree();
@@ -104,7 +106,7 @@ void ControlMain::serverTreeCellDoubleClick(std::string name) {
 	if(name.compare("..") == 0) {
 		ContainerFileInfo fileObject = (*this->serverFilesList).front();
 		try {
-			this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent(this->modelDAOObject->goUpInDirPath(fileObject.filePath), this->currentConnectionID);
+			this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent(this->modelDAOObject->goUpInDirPath(fileObject.filePath));
 		} catch (ContainerException &e) {
 			this->exceptionManagerObject.manageException(e);
 		}
@@ -118,7 +120,7 @@ void ControlMain::serverTreeCellDoubleClick(std::string name) {
 		}
 		if(fileObject.isDir) {
 			try {
-				this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent((fileObject.filePath + fileObject.fileName + "/"), this->currentConnectionID);
+				this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent((fileObject.filePath + fileObject.fileName + "/"));
 			} catch (ContainerException &e) {
 				this->exceptionManagerObject.manageException(e);
 			}
@@ -133,8 +135,8 @@ void ControlMain::serverTreeCellDoubleClick(std::string name) {
 
 void ControlMain::serverDeleteButton(ContainerFileInfo* file) {
 	if(this->viewGuiBuilderObject->spawnAreYouSureWindow()) {
-		if(this->modelDAOObject->deleteServerFile(file, this->currentConnectionID)) {
-			this->refreshServerTree(file->filePath, this->currentConnectionID);
+		if(this->modelDAOObject->deleteServerFile(file)) {
+			this->refreshServerTree(file->filePath);
 			this->viewGuiBuilderObject->deactivateDownloadButton();
 		} else {
 			if(file->isDir) {
@@ -184,9 +186,9 @@ void ControlMain::serverNewFolderButton() {
 			return;
 		}
 	}
-	bool flag = this->modelDAOObject->newFolderServer(this->serverFilesList->front().filePath+name, this->currentConnectionID);
+	bool flag = this->modelDAOObject->newFolderServer(this->serverFilesList->front().filePath+name);
 	if(flag) {
-		this->refreshServerTree(this->serverFilesList->front().filePath, this->currentConnectionID);
+		this->refreshServerTree(this->serverFilesList->front().filePath);
 	} else {
 		this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_cannotCreateDirectory, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
 	}
@@ -202,9 +204,9 @@ void ControlMain::refreshLocalTree(std::string path) {
 	this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
 }
 
-void ControlMain::refreshServerTree(std::string path, int connectionID) {
+void ControlMain::refreshServerTree(std::string path) {
 	try {
-		this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent(path, connectionID);
+		this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent(path);
 		
 	} catch (ContainerException &e) {
 		this->exceptionManagerObject.manageException(e);
@@ -215,23 +217,48 @@ void ControlMain::refreshServerTree(std::string path, int connectionID) {
 
 void ControlMain::downloadButton(ContainerFileInfo* fileServer) {
 	this->viewGuiBuilderObject->spawnProgressBar();
-	fcallback progressCallback = this->viewGuiBuilderObject->getProgressBarCallback();
+	this->lastFileDownload = fileServer;
+	std::function<void(double)> progressCallback = this->viewGuiBuilderObject->getProgressBarCallback();
 	bool flag;
 	try {
-		flag = this->modelDAOObject->downloadFile(fileServer->filePath, this->localFilesList->front().filePath, fileServer->fileName, fileServer->fileSize, progressCallback, this->currentConnectionID);
+		flag = this->modelDAOObject->downloadFile(fileServer->filePath, this->localFilesList->front().filePath, fileServer->fileName, fileServer->fileSize, progressCallback, std::bind(&ControlMain::endDownloadCallback, this, std::placeholders::_1));
 	} catch (ContainerException &e) {
 		progressCallback(1);
 		this->exceptionManagerObject.manageException(e);
 	}
-	std::thread execution(
-	[&] () -> void {
-		std::this_thread::sleep_for (std::chrono::seconds(5));
-	});
-	execution.detach();
+}
+
+void ControlMain::endDownloadCallback(int param) {
+	this->lastDownloadCode = param;
+	this->downloadEnd = true;
+}
+
+void ControlMain::checkDownloadEnd() {
+	this->viewGuiBuilderObject->refreshProgressBar();
+	if(this->downloadEnd == true) {
+		if(this->lastDownloadCode != 0) {
+			this->modelDAOObject->deleteLocalFile(&ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileDownload->fileName, 0));
+		}
+		this->refreshLocalTree(this->localFilesList->front().filePath);
+		this->downloadEnd = false;
+	} else {
+
+	}
 }
 
 
+void ControlMain::checkUploadEnd() {
+
+}
+
 void ControlMain::cancelDownload() {
+	try {
+		this->modelDAOObject->killDownloadThread();
+	} catch (ContainerException &e) {
+		this->exceptionManagerObject.manageException(e);
+	}
+	ContainerFileInfo fileToDelete = ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileDownload->fileName, 0, false, -1, -1, -1, -1, -1, 0);
+	this->modelDAOObject->deleteLocalFile(&fileToDelete);
 }
 
 void ControlMain::uploadButton(ContainerFileInfo* fileLocal) {

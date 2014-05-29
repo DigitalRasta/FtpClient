@@ -28,14 +28,16 @@ private:
 	std::string hostURL;
 	std::list<ContainerFileInfo>* filesList;
 
-	HANDLE mainThread;
-	int downloadCode;
+	int transferCode;
 
 	ExceptionCode translateCurlErrorCode(int code);
 
-	static DWORD WINAPI startDownload(void* Param);
+	static DWORD WINAPI startTransfer(void* Param);
 
 	std::function<void(int)> endDownloadCallback;
+	std::function<void(int)> endUploadCallback;
+
+	bool downloadOrUpload;
 
 public:
 	ModelConnection(std::string host, std::string port, std::string login, std::string password, InnerConfig* configObject);
@@ -44,20 +46,22 @@ public:
 	
 	bool deleteFile(ContainerFileInfo *file);
 	bool newFolder(std::string pathWithName);
-	bool downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback);
+	void downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback);
+	void uploadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endUploadCallback);
 
 	void setFilesList(std::list<ContainerFileInfo>* list);
 
-	static DWORD WINAPI checkDownloadRunning(void* Param);
+	static DWORD WINAPI checkTransferRunning(void* Param);
 
 	void parseLineAndAddToList(std::string line, int id);
 	void clearListAndInit(void);
 	virtual ~ModelConnection(void);
 	static size_t GetFilesList_response(void *ptr, size_t size, size_t nmemb, void * object);
 	static size_t downloadFileWriteFunction(void *buffer, size_t size, size_t nmemb, void *stream);
+	static size_t uploadFileWriteFunction(void *buffer, size_t size, size_t nmemb, void *stream);
 
-	HANDLE downloadThread;
-	HANDLE downloadObserverThread;
-	struct FtpClient::FtpFile downloadFileHandler;
+	HANDLE transferThread;
+	HANDLE transferObserverThread;
+	struct FtpClient::FtpFile transferFileHandler;
 };
 

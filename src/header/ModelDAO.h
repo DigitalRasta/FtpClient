@@ -125,9 +125,11 @@ public:
 
 	virtual bool newFolderServer(std::string pathWithName);
 
-	virtual bool downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback);
+	virtual void downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback);
 	
-	virtual void killDownloadThread();
+	virtual void uploadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endUploadCallback);
+
+	virtual void killTransferThread();
 private:
 	InnerConfig* innerConfigObject;
 	ModelConnection* connectionObject;

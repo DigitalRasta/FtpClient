@@ -44,11 +44,15 @@ public:
 
 	virtual void cancelDownload();
 
-	void endDownloadCallback(int param);
+	virtual void cancelUpload();
 
-	void checkDownloadEnd();
+	void endTransferCallback(int param);
 
-	void checkUploadEnd();
+	void checkTransferEnd();
+
+	bool checkProgramEnd();
+
+	void endProgram();
 
 	virtual ~ControlMain(void);
 private:
@@ -65,12 +69,14 @@ private:
 
 	void refreshProgressBar();
 
-	bool downloadEnd;
-	bool uploadEnd;
+	bool transferEnd;
+	bool programEnd;
 
-	int lastDownloadCode;
+	bool downloadOrUpload;
 
-	ContainerFileInfo* lastFileDownload;
+	int lastTransferCode;
+
+	ContainerFileInfo* lastFileTransfer;
 
 
 };

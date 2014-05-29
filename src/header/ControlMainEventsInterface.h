@@ -27,5 +27,9 @@ public:
 	virtual void uploadButton(ContainerFileInfo* fileLocal) = 0;
 
 	virtual void cancelDownload() = 0;
+
+	virtual void cancelUpload() = 0;
+
+	virtual void endProgram() = 0;
 };
 

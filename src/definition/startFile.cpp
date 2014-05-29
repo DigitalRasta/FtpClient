@@ -25,9 +25,11 @@ int main(int argc, char* argv[])
 	*/
 	controlMainObject->startFtpClient(); 
 	while(true) {
+		controlMainObject->checkTransferEnd();
+		if(controlMainObject->checkProgramEnd()) {
+			break;
+		}
 		gtk_main_iteration_do(TRUE);
-		controlMainObject->checkDownloadEnd();
-		controlMainObject->checkUploadEnd();
 	}
     return 0;
 }

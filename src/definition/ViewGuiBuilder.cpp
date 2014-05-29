@@ -6,6 +6,7 @@
 #include <gtk-3.0/gtk/gtk.h>
 #include <string>
 #include <list>
+#include <sstream>
 
 
 using namespace FtpClient;
@@ -49,6 +50,8 @@ void ViewGuiBuilder::initializeMainWindow(void) {
 	this->buildInterface();
 
 	gtk_widget_show_all(this->mainWindowHandler);
+
+	g_signal_connect(this->mainWindowHandler, "delete-event",G_CALLBACK(this->mainWindowCloseButtonClicked), this);
 	
 }
 
@@ -410,10 +413,11 @@ void ViewGuiBuilder::downloadButtonClicked(GtkWidget *widget, gpointer data) {
 
 void ViewGuiBuilder::uploadButtonClicked(GtkWidget *widget, gpointer data) {
 	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	object->controlObject->downloadButton(object->localCurrentFileSelected);
+	object->controlObject->uploadButton(object->localCurrentFileSelected);
 }
 
-void ViewGuiBuilder::spawnProgressBar() {
+void ViewGuiBuilder::spawnProgressBar(bool download) {
+	this->downloadOrUpload = download;
 	this->deactivateDeleteButton();
 	this->deactivateDownloadButton();
 	this->deactivateNewFolderButton();
@@ -422,11 +426,11 @@ void ViewGuiBuilder::spawnProgressBar() {
 	gtk_widget_set_size_request(this->progressBarDialog, 600, 200);
 	GtkWidget* layoutManager = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(layoutManager), 20);
-	GtkWidget* label = gtk_label_new("Progress");
+	this->progressBarLabel = gtk_label_new("Progress");
 	this->progressBarHandler = gtk_progress_bar_new();
 	gtk_widget_set_hexpand(this->progressBarHandler, TRUE);
 	this->progressBarCancelButton = gtk_button_new_with_label("Cancel");
-	gtk_grid_attach(GTK_GRID(layoutManager), label,0,0,3,1);
+	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarLabel,0,0,3,1);
 	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarHandler,0,1,3,1);
 	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarCancelButton,1,2,1,1);
 	gtk_container_add(GTK_CONTAINER(this->progressBarDialog), layoutManager);
@@ -440,34 +444,54 @@ std::function<void(double)> ViewGuiBuilder::getProgressBarCallback() {
 }
 
 void ViewGuiBuilder::progressBarSetProgress(double set) {
-	if(this->progressBarDialog != NULL) {
-		if(set > 0.99) {
-			gtk_widget_destroy(this->progressBarDialog);
-			this->progressBarDialog = NULL;
-			this->activateDeleteButton();
-			this->activateDownloadButton();
-			this->activateNewFolderButton();
-			this->activateUploadButton();
-		} else {
-			gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(this->progressBarHandler), set);
-		}
-	}
+	this->progress = set;
 }
 
 void ViewGuiBuilder::refreshProgressBar() {
 	if(this->progressBarDialog != NULL) {
+		gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(this->progressBarHandler), this->progress);
 		gtk_widget_queue_draw(this->progressBarHandler);
+		int cutProgress = (this->progress*100);
+		std::ostringstream stream;
+		stream << cutProgress << " %";
+		gtk_label_set_text(GTK_LABEL(this->progressBarLabel), stream.str().c_str());
 	}
 }
 
 void ViewGuiBuilder::progressBarWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data) {
 	ViewGuiBuilder* This = (ViewGuiBuilder*)data;
-	This->controlObject->cancelDownload();
+	if(This->downloadOrUpload) {
+		This->controlObject->cancelDownload();
+	} else {
+
+	}
 	gtk_widget_destroy(This->progressBarDialog);
 }
 
 void ViewGuiBuilder::progressBarCancelButtonClicked(GtkWidget *widget, gpointer data) {
 	ViewGuiBuilder* This = (ViewGuiBuilder*)data;
-	This->controlObject->cancelDownload();
+	if(This->downloadOrUpload) {
+		This->controlObject->cancelDownload();
+	} else {
+
+	}
 	gtk_widget_destroy(This->progressBarDialog);
+}
+
+void ViewGuiBuilder::mainWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data) {
+	ViewGuiBuilder* This = (ViewGuiBuilder*)data;
+	This->controlObject->endProgram();
+	gtk_widget_destroy(This->mainWindowHandler);
+}
+
+void ViewGuiBuilder::endTransfer() {
+	this->progress = 0;
+	if(this->progressBarDialog != NULL) {
+		gtk_widget_destroy(this->progressBarDialog);
+		this->progressBarDialog = NULL;
+		this->activateDeleteButton();
+		this->activateDownloadButton();
+		this->activateNewFolderButton();
+		this->activateUploadButton();
+	}
 }

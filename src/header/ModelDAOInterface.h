@@ -38,8 +38,10 @@ public:
 
 	virtual bool newFolderServer(std::string pathWithName) = 0;
 
-	virtual bool downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback) = 0;
+	virtual void downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback) = 0;
 
-	virtual void killDownloadThread() = 0;
+	virtual void uploadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endUploadCallback) = 0;
+
+	virtual void killTransferThread() = 0;
 };
 

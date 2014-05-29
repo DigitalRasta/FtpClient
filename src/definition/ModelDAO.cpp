@@ -174,17 +174,17 @@ bool ModelDAO::newFolderServer(std::string pathWithName) {
 	return this->connectionObject->newFolder(pathWithName);
 }
 
-bool ModelDAO::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback) {
-	return this->connectionObject->downloadFile(serverPath, localPath, name, size, progressBarCallback, endDownloadCallback);
+void ModelDAO::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback) {
+	this->connectionObject->downloadFile(serverPath, localPath, name, size, progressBarCallback, endDownloadCallback);
 }
 
-void ModelDAO::killDownloadThread() {
-	fclose(this->connectionObject->downloadFileHandler.stream);
-	bool flag = TerminateThread(this->connectionObject->downloadThread, 1);
-	if(!flag) {
-		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_THREAD_CANNOT_KILL);
-	}
-	flag = TerminateThread(this->connectionObject->downloadObserverThread, 1);
+void ModelDAO::uploadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endUploadCallback) {
+	this->connectionObject->uploadFile(serverPath, localPath, name, size, progressBarCallback, endUploadCallback);
+}
+
+void ModelDAO::killTransferThread() {
+	fclose(this->connectionObject->transferFileHandler.stream);
+	bool flag = TerminateThread(this->connectionObject->transferThread, 1);
 	if(!flag) {
 		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_THREAD_CANNOT_KILL);
 	}

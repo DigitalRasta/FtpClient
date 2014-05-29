@@ -39,11 +39,13 @@ public:
 
 	virtual std::string spawnInsertNameWindow() = 0;
 
-	virtual void spawnProgressBar() = 0;
+	virtual void spawnProgressBar(bool download) = 0;
 
 	virtual std::function<void(double)> getProgressBarCallback() = 0;
 
 	virtual void refreshProgressBar() = 0;
+
+	virtual void endTransfer() = 0;
 
 };
 

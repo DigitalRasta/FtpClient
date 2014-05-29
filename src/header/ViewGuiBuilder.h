@@ -6,6 +6,7 @@
 #include "ContainerFileInfo.h"
 #include <gtk-3.0/gtk/gtk.h>
 #include <functional>
+#include <atomic>
 
 namespace FtpClient {
     class ViewGuiBuilder;
@@ -71,17 +72,23 @@ public:
 
 	virtual std::string spawnInsertNameWindow();
 
-	virtual void spawnProgressBar();
+	virtual void spawnProgressBar(bool download);
 
 	virtual std::function<void(double)> getProgressBarCallback();
 	
 	void progressBarSetProgress(double set);
 
 	virtual void refreshProgressBar();
+
+	virtual void endTransfer();
 private:
 	GtkWidget* progressBarHandler;
 	GtkWidget* progressBarDialog;
 	GtkWidget* progressBarCancelButton;
+	GtkWidget* progressBarLabel;
+	std::atomic<double> progress;
+	
+	bool downloadOrUpload;
 
 	InnerConfig* innerConfigObject;
 	ControlMainEventsInterface* controlObject;
@@ -205,5 +212,7 @@ private:
 	static void progressBarWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data);
 
 	static void progressBarCancelButtonClicked(GtkWidget *widget, gpointer data);
+
+	static void mainWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data);
 };
 

@@ -15,8 +15,8 @@ using namespace FtpClient;
 
 ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject), exceptionManagerObject(viewGuiBuilderObject, innerConfigObject){
 	this->localFilesList = NULL;
-	this->downloadEnd = false;
-	this->uploadEnd = false;
+	this->transferEnd = false;
+	this->programEnd = false;
 }
 
 void ControlMain::startFtpClient(void) {
@@ -216,53 +216,77 @@ void ControlMain::refreshServerTree(std::string path) {
 }
 
 void ControlMain::downloadButton(ContainerFileInfo* fileServer) {
-	this->viewGuiBuilderObject->spawnProgressBar();
-	this->lastFileDownload = fileServer;
+	this->downloadOrUpload = true;
+	this->viewGuiBuilderObject->spawnProgressBar(true);
+	this->lastFileTransfer = fileServer;
 	std::function<void(double)> progressCallback = this->viewGuiBuilderObject->getProgressBarCallback();
-	bool flag;
 	try {
-		flag = this->modelDAOObject->downloadFile(fileServer->filePath, this->localFilesList->front().filePath, fileServer->fileName, fileServer->fileSize, progressCallback, std::bind(&ControlMain::endDownloadCallback, this, std::placeholders::_1));
+		this->modelDAOObject->downloadFile(fileServer->filePath, this->localFilesList->front().filePath, fileServer->fileName, fileServer->fileSize, progressCallback, std::bind(&ControlMain::endTransferCallback, this, std::placeholders::_1));
 	} catch (ContainerException &e) {
-		progressCallback(1);
+		this->viewGuiBuilderObject->endTransfer();
 		this->exceptionManagerObject.manageException(e);
 	}
 }
 
-void ControlMain::endDownloadCallback(int param) {
-	this->lastDownloadCode = param;
-	this->downloadEnd = true;
+void ControlMain::endTransferCallback(int param) {
+	this->lastTransferCode = param;
+	this->transferEnd = true;
 }
 
-void ControlMain::checkDownloadEnd() {
+void ControlMain::checkTransferEnd() {
 	this->viewGuiBuilderObject->refreshProgressBar();
-	if(this->downloadEnd == true) {
-		if(this->lastDownloadCode != 0) {
-			this->modelDAOObject->deleteLocalFile(&ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileDownload->fileName, 0));
+	if(this->transferEnd == true) {
+		if(this->lastTransferCode != 0) {
+			this->modelDAOObject->deleteLocalFile(&ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileTransfer->fileName, 0));
+			this->exceptionManagerObject.manageException(ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, (ExceptionCode)this->lastTransferCode));
 		}
 		this->refreshLocalTree(this->localFilesList->front().filePath);
-		this->downloadEnd = false;
-	} else {
-
+		this->transferEnd = false;
+		this->viewGuiBuilderObject->endTransfer();
 	}
 }
 
-
-void ControlMain::checkUploadEnd() {
-
+bool ControlMain::checkProgramEnd() {
+	return this->programEnd;
 }
 
 void ControlMain::cancelDownload() {
 	try {
-		this->modelDAOObject->killDownloadThread();
+		this->modelDAOObject->killTransferThread();
 	} catch (ContainerException &e) {
 		this->exceptionManagerObject.manageException(e);
 	}
-	ContainerFileInfo fileToDelete = ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileDownload->fileName, 0, false, -1, -1, -1, -1, -1, 0);
+	ContainerFileInfo fileToDelete = ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileTransfer->fileName, 0, false, -1, -1, -1, -1, -1, 0);
 	this->modelDAOObject->deleteLocalFile(&fileToDelete);
+	this->viewGuiBuilderObject->endTransfer();
+}
+
+void ControlMain::cancelUpload() {
+	try {
+		this->modelDAOObject->killTransferThread();
+	} catch (ContainerException &e) {
+		this->exceptionManagerObject.manageException(e);
+	}
+	//ContainerFileInfo fileToDelete = ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileTransfer->fileName, 0, false, -1, -1, -1, -1, -1, 0);
+	//this->modelDAOObject->deleteLocalFile(&fileToDelete);
+	this->viewGuiBuilderObject->endTransfer();
 }
 
 void ControlMain::uploadButton(ContainerFileInfo* fileLocal) {
+	this->downloadOrUpload = false;
+	this->viewGuiBuilderObject->spawnProgressBar(false);
+	this->lastFileTransfer = fileLocal;
+	std::function<void(double)> progressCallback = this->viewGuiBuilderObject->getProgressBarCallback();
+	try {
+		this->modelDAOObject->uploadFile(this->serverFilesList->front().filePath, fileLocal->filePath, fileLocal->fileName, fileLocal->fileSize, progressCallback, std::bind(&ControlMain::endTransferCallback, this, std::placeholders::_1));
+	} catch (ContainerException &e) {
+		this->viewGuiBuilderObject->endTransfer();
+		this->exceptionManagerObject.manageException(e);
+	}
+}
 
+void ControlMain::endProgram() {
+	this->programEnd = true;
 }
 
 ControlMain::~ControlMain(void){

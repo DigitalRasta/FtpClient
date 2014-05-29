@@ -181,57 +181,73 @@ size_t ModelConnection::downloadFileWriteFunction(void *buffer, size_t size, siz
 	return result;
 }
 
-bool ModelConnection::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback) {
+void ModelConnection::downloadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endDownloadCallback) {
+	this->downloadOrUpload = true;
 	this->endDownloadCallback = endDownloadCallback;
-	this->downloadFileHandler.stream = fopen((localPath+name).c_str(), "wb");
-	this->mainThread = GetCurrentThread();
-	if(this->downloadFileHandler.stream) {
-		fclose(this->downloadFileHandler.stream);
+	this->transferFileHandler.stream = fopen((localPath+name).c_str(), "wb");
+	if(this->transferFileHandler.stream) {
+		fclose(this->transferFileHandler.stream);
 	} else {
-		return false;
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_FILE_IO);
 	}
-	this->downloadFileHandler.stream =  fopen((localPath+name).c_str(), "ab");
-	this->downloadFileHandler.size = size;
-	this->downloadFileHandler.progress = 0;
-	this->downloadFileHandler.progressBarCallback = progressBarCallback;
+	this->transferFileHandler.stream =  fopen((localPath+name).c_str(), "ab");
+	this->transferFileHandler.size = size;
+	this->transferFileHandler.progress = 0;
+	this->transferFileHandler.progressBarCallback = progressBarCallback;
 	this->libFtpObject = curl_easy_init();
 	curl_easy_setopt(this->libFtpObject, CURLOPT_URL, (this->hostURL+serverPath+name).c_str());
 	curl_easy_setopt(this->libFtpObject, CURLOPT_USERPWD, this->loginPass.c_str());
 	curl_easy_setopt(this->libFtpObject, CURLOPT_FTP_RESPONSE_TIMEOUT, 10);
 	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEFUNCTION, this->downloadFileWriteFunction);
-	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEDATA, &this->downloadFileHandler);
-	this->downloadThread = CreateThread(NULL, 0, startDownload, (void*) this, 0, NULL);
-	this->downloadObserverThread = CreateThread(NULL, 0, checkDownloadRunning, (void*) this, 0, NULL);
-	return true;
+	curl_easy_setopt(this->libFtpObject, CURLOPT_WRITEDATA, &this->transferFileHandler);
+	this->transferThread = CreateThread(NULL, 0, startTransfer, (void*) this, 0, NULL);
 }
 
-DWORD WINAPI ModelConnection::startDownload(void* Param) {
+size_t ModelConnection::uploadFileWriteFunction(void *buffer, size_t size, size_t nmemb, void *stream){
+	struct FtpFile* out = (struct FtpFile*)stream;
+	if(!out->stream) {
+		return -1;
+	}
+	uint64_t result = fread(buffer, size, nmemb, out->stream);
+	out->progress += result;
+	double precent = ((double)out->progress) / ((double)out->size);
+	out->progressBarCallback(precent);
+	return result;
+}
+
+void ModelConnection::uploadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endUploadCallback) {
+	this->downloadOrUpload = false;
+	this->endUploadCallback = endUploadCallback;
+	this->transferFileHandler.stream = fopen((localPath+name).c_str(), "rb");
+	if(!this->transferFileHandler.stream) {
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, ExceptionCode::ERROR_FILE_IO);
+	}
+	this->transferFileHandler.size = size;
+	this->transferFileHandler.progress = 0;
+	this->transferFileHandler.progressBarCallback = progressBarCallback;
+	this->libFtpObject = curl_easy_init();
+	curl_easy_setopt(this->libFtpObject, CURLOPT_URL, (this->hostURL+serverPath+name).c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_USERPWD, this->loginPass.c_str());
+	curl_easy_setopt(this->libFtpObject, CURLOPT_FTP_RESPONSE_TIMEOUT, 10);
+	curl_easy_setopt(this->libFtpObject, CURLOPT_UPLOAD, 1L);
+	curl_easy_setopt(this->libFtpObject, CURLOPT_READFUNCTION, this->uploadFileWriteFunction);
+	curl_easy_setopt(this->libFtpObject, CURLOPT_READDATA, &this->transferFileHandler);
+	this->transferThread = CreateThread(NULL, 0, startTransfer, (void*) this, 0, NULL);
+}
+
+DWORD WINAPI ModelConnection::startTransfer(void* Param) {
 	ModelConnection* This = (ModelConnection*)Param;
 	int check = curl_easy_perform(This->libFtpObject);
-	fclose(This->downloadFileHandler.stream);
+	fclose(This->transferFileHandler.stream);
 	if(check == 0) {
-		This->downloadCode = 0;
+		This->transferCode = 0;
 	} else {
-		This->downloadCode = This->translateCurlErrorCode(check);
+		This->transferCode = This->translateCurlErrorCode(check);
 	}
-	return 0;
-}
-
-DWORD WINAPI ModelConnection::checkDownloadRunning(void* Param) {
-	ModelConnection* This = (ModelConnection*)Param;
-	while(true) {
-		int threadResult = WaitForSingleObject(This->downloadThread, 20);
-		if(threadResult == WAIT_TIMEOUT) {
-			Sleep(100);
-		} else {
-			if(threadResult == WAIT_OBJECT_0) {
-				This->endDownloadCallback(This->downloadCode);
-				break;
-			} else {
-				This->endDownloadCallback(-1);
-				break;
-			}
-		}
+	if(This->downloadOrUpload) {
+		This->endDownloadCallback(This->transferCode);
+	} else {
+		This->endUploadCallback(This->transferCode);
 	}
 	return 0;
 }

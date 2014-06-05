@@ -58,6 +58,7 @@ void ControlMain::connectWindowButtonConnectClicked(std::string host, std::strin
 }
 
 void ControlMain::localTreeCellDoubleClick(std::string name) {
+	std::list<ContainerFileInfo>* old = this->localFilesList;
 	if(name.compare("..") == 0) {
 		ContainerFileInfo fileObject = (*this->localFilesList).front();
 		if(this->modelDAOObject->isPathLogicalPartition(fileObject.filePath)) {
@@ -66,6 +67,7 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 
 			try {
 				this->localFilesList = this->modelDAOObject->getDirectoryContent(this->modelDAOObject->goUpInDirPath(fileObject.filePath));
+				delete(old);
 			} catch (ContainerException &e) {
 				this->exceptionManagerObject.manageException(e);
 			}
@@ -82,12 +84,14 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 			if(fileObject.filePath.size() == 2) {
 				try {
 					this->localFilesList = this->modelDAOObject->getDirectoryContent(fileObject.filePath);
+					delete(old);
 				} catch (ContainerException &e) {
 					this->exceptionManagerObject.manageException(e);
 				}
 			} else {
 				try {
 					this->localFilesList = this->modelDAOObject->getDirectoryContent((fileObject.filePath + fileObject.fileName));
+					delete(old);
 				} catch (ContainerException &e) {
 					this->exceptionManagerObject.manageException(e);
 				}
@@ -103,6 +107,7 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 
 
 void ControlMain::serverTreeCellDoubleClick(std::string name) {
+	std::list<ContainerFileInfo>* old = this->serverFilesList;
 	if(name.compare("..") == 0) {
 		ContainerFileInfo fileObject = (*this->serverFilesList).front();
 		try {
@@ -241,6 +246,7 @@ void ControlMain::checkTransferEnd() {
 			this->exceptionManagerObject.manageException(ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, (ExceptionCode)this->lastTransferCode));
 		}
 		this->refreshLocalTree(this->localFilesList->front().filePath);
+		this->refreshServerTree(this->serverFilesList->front().filePath);
 		this->transferEnd = false;
 		this->viewGuiBuilderObject->endTransfer();
 	}
@@ -290,4 +296,6 @@ void ControlMain::endProgram() {
 }
 
 ControlMain::~ControlMain(void){
+	delete(this->localFilesList);
+	delete(this->serverFilesList);
 }

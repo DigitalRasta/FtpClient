@@ -5,10 +5,15 @@
 #include "../header/ModelDAO.h"
 #include "../header/InnerConfig.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 using namespace std;
 using namespace FtpClient;
 int main(int argc, char* argv[])
 {
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
     gtk_init(&argc, &argv);
 	/*
 	* Layers initialization
@@ -31,5 +36,9 @@ int main(int argc, char* argv[])
 		}
 		gtk_main_iteration_do(TRUE);
 	}
+	delete(innerConfigObject);
+	delete(viewGuiBuilderObject);
+	delete(modelDAOObject);
+	delete(controlMainObject);
     return 0;
 }

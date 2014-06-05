@@ -25,23 +25,25 @@ ViewGuiBuilder::ViewGuiBuilder(InnerConfig* innerConfigObject): innerConfigObjec
 	this->buttonDeleteIconInactive = gtk_image_new_from_file (this->innerConfigObject->view_buttonDeleteInactiveIconSrc.c_str());
 	this->buttonNewFolderIconActive = gtk_image_new_from_file (this->innerConfigObject->view_buttonNewFolderActiveIconSrc.c_str());
 	this->buttonNewFolderIconInactive = gtk_image_new_from_file (this->innerConfigObject->view_buttonNewFolderInactiveIconSrc.c_str());
+
 }
 
-	/*START
-	*--->mainWindow<---
-	*/
+ViewGuiBuilder::~ViewGuiBuilder(void){
+}
+
 void ViewGuiBuilder::initializeMainWindow(void) {
 	this->mainWindowHandler = gtk_window_new(GTK_WINDOW_TOPLEVEL);  
-	gtk_window_set_icon_from_file(GTK_WINDOW(this->mainWindowHandler), "img/icon.png", NULL);
+	gtk_window_set_icon_from_file(GTK_WINDOW(this->mainWindowHandler), this->innerConfigObject->view_mainIconPath.c_str(), NULL);
 	gtk_window_set_title(GTK_WINDOW(this->mainWindowHandler), this->innerConfigObject->lang_mainWindowTitle.c_str());
 	gtk_widget_set_size_request(GTK_WIDGET(this->mainWindowHandler), this->innerConfigObject->view_mainWindowWidth, this->innerConfigObject->view_mainWindowHeight);
 	gtk_window_set_position(GTK_WINDOW(this->mainWindowHandler), GTK_WIN_POS_CENTER);
+	//Parse color from config and set to background
 	GdkRGBA color;
 	gdk_rgba_parse(&color,this->innerConfigObject->view_mainWindowBackground.c_str());
 	gtk_widget_override_background_color(this->mainWindowHandler, GTK_STATE_FLAG_NORMAL, &color);
 	g_signal_connect(G_OBJECT(this->mainWindowHandler), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
-	this->layoutManager = gtk_grid_new();
+	this->layoutManager = gtk_grid_new(); //create layout manager for main window
 	gtk_grid_set_row_spacing(GTK_GRID(this->layoutManager), 20);
 	gtk_grid_set_column_spacing(GTK_GRID(this->layoutManager), 20);
 	gtk_grid_set_column_homogeneous (GTK_GRID(this->layoutManager), FALSE);
@@ -50,24 +52,29 @@ void ViewGuiBuilder::initializeMainWindow(void) {
 	this->buildInterface();
 
 	gtk_widget_show_all(this->mainWindowHandler);
-
+	//Event used for exit from main program loop
 	g_signal_connect(this->mainWindowHandler, "delete-event",G_CALLBACK(this->mainWindowCloseButtonClicked), this);
-	
 }
 
 void ViewGuiBuilder::buildInterface(void) {
+	//Menu bar create
 	this->menuBar = gtk_menu_bar_new();
-	GtkWidget* menuItemButtonConnect =  gtk_menu_item_new_with_label(this->innerConfigObject->lang_mainWindowMenuConnectButtonText.c_str());
-	gtk_menu_shell_append(GTK_MENU_SHELL(this->menuBar), menuItemButtonConnect);
+	this->connectButton =  gtk_menu_item_new_with_label(this->innerConfigObject->lang_mainWindowMenuConnectButtonText.c_str());
+	this->disconnectButton =  gtk_menu_item_new_with_label(this->innerConfigObject->lang_mainWindowMenuDisconnectButtonText.c_str());
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menuBar), this->connectButton);
+	gtk_menu_shell_append(GTK_MENU_SHELL(this->menuBar), this->disconnectButton);
+	gtk_widget_set_sensitive(this->disconnectButton, false);
 	gtk_widget_set_hexpand(this->menuBar, TRUE);
+	//Add menu, lists and buttons to main window layout manager
 	gtk_grid_attach(GTK_GRID(this->layoutManager), this->menuBar,0,0,3,1);
 	gtk_grid_attach(GTK_GRID(this->layoutManager), this->fileListManagerObject->createFilesListServer(),0,1,1,3);
 	gtk_grid_attach(GTK_GRID(this->layoutManager), this->fileListManagerObject->createFilesListLocal(),2,1,1,3);
 	gtk_grid_attach(GTK_GRID(this->layoutManager), this->createStandardButtons(),1,2,1,1);
 	
-	g_signal_connect(menuItemButtonConnect, "activate", G_CALLBACK(this->mainWindowMenuBarButtonConnectClicked), this);
+	g_signal_connect(this->connectButton, "activate", G_CALLBACK(this->mainWindowMenuBarButtonConnectClicked), this);
 	g_signal_connect(this->fileListManagerObject->getLocalTreeHandler(), "row-activated", G_CALLBACK(this->localTreeRowDoubleClick), this);
 	g_signal_connect(this->fileListManagerObject->getServerTreeHandler(), "row-activated", G_CALLBACK(this->serverTreeRowDoubleClick), this);
+	//Set lists selection setting to only one row
 	GtkTreeSelection* selectionServer = gtk_tree_view_get_selection(GTK_TREE_VIEW(this->fileListManagerObject->getServerTreeHandler()));
 	gtk_tree_selection_set_mode(selectionServer, GTK_SELECTION_SINGLE);
 	gtk_tree_selection_set_select_function(selectionServer, this->serverTreeRowSelected, this, NULL);
@@ -75,21 +82,10 @@ void ViewGuiBuilder::buildInterface(void) {
 	gtk_tree_selection_set_mode(selectionLocal, GTK_SELECTION_SINGLE);
 	gtk_tree_selection_set_select_function(selectionLocal, this->localTreeRowSelected, this, NULL);
 
-	 g_signal_connect(this->buttonDelete, "clicked", G_CALLBACK (this->deleteButtonClicked), this);
-	 g_signal_connect(this->buttonNewFolder, "clicked", G_CALLBACK (this->newFolderButtonClicked), this);
-	 g_signal_connect(this->buttonDownload, "clicked", G_CALLBACK (this->downloadButtonClicked), this);
-	 g_signal_connect(this->buttonUpload, "clicked", G_CALLBACK (this->uploadButtonClicked), this);
-}
-
-void ViewGuiBuilder::mainWindowMenuBarButtonConnectClicked(GtkWidget* object, gpointer* data) {
-	ViewGuiBuilder* guiObject = (ViewGuiBuilder*)data;
-
-	if(guiObject->connectWindow == NULL) {
-		guiObject->spawnConnectWindow();
-	} else {
-		gtk_widget_destroy(guiObject->connectWindow);
-		guiObject->spawnConnectWindow();
-	}
+	g_signal_connect(this->buttonDelete, "clicked", G_CALLBACK (this->deleteButtonClicked), this);
+	g_signal_connect(this->buttonNewFolder, "clicked", G_CALLBACK (this->newFolderButtonClicked), this);
+	g_signal_connect(this->buttonDownload, "clicked", G_CALLBACK (this->downloadButtonClicked), this);
+	g_signal_connect(this->buttonUpload, "clicked", G_CALLBACK (this->uploadButtonClicked), this);
 }
 
 GtkWidget* ViewGuiBuilder::createStandardButtons() {
@@ -112,22 +108,18 @@ GtkWidget* ViewGuiBuilder::createStandardButtons() {
 void ViewGuiBuilder::bindMainWindowEvents(ControlMainEventsInterface* controlObject) {
 	this->controlObject = controlObject;
 }
-	/*END
-	*<---mainWindow--->
-	*/
 
-	/*START
-	*--->connectWindow<---
-	*/
 void ViewGuiBuilder::spawnConnectWindow(void) {
 	this->connectWindow = gtk_dialog_new();
 	gtk_window_set_title(GTK_WINDOW(this->connectWindow), this->innerConfigObject->lang_connectWindowTitle.c_str());
 	gtk_widget_set_size_request(this->connectWindow, this->innerConfigObject->view_connectWindowWidth, this->innerConfigObject->view_connectWindowHeight);
 	gtk_window_set_resizable(GTK_WINDOW(this->connectWindow), FALSE);
 	gtk_window_set_position(GTK_WINDOW(this->connectWindow), GTK_WIN_POS_CENTER);
+	//Main window color for background
 	GdkRGBA color;
 	gdk_rgba_parse(&color,this->innerConfigObject->view_mainWindowBackground.c_str());
 	gtk_widget_override_background_color(this->connectWindow, GTK_STATE_FLAG_NORMAL, &color);
+	//Insert fields and button
 	GtkWidget* contentArea = gtk_dialog_get_content_area (GTK_DIALOG (this->connectWindow));
 	gtk_container_add(GTK_CONTAINER(contentArea), this->buildConnectWindowInterface());
 	//Events
@@ -137,6 +129,7 @@ void ViewGuiBuilder::spawnConnectWindow(void) {
 }
 
 GtkWidget* ViewGuiBuilder::buildConnectWindowInterface(void) {
+	//Create labels and fields
 	GtkWidget* connectWindowManager = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(connectWindowManager), 20);
 	GtkWidget* label_host = gtk_label_new(this->innerConfigObject->lang_connectWindowLabelHost.c_str());
@@ -148,9 +141,9 @@ GtkWidget* ViewGuiBuilder::buildConnectWindowInterface(void) {
 	this->connectWindow_inputLogin = gtk_entry_new();
 	this->connectWindow_inputPassword = gtk_entry_new();
 	gtk_entry_set_visibility(GTK_ENTRY(this->connectWindow_inputPassword), FALSE);
-
+	//Create connect button.
 	this->connectWindow_buttonConnect = gtk_button_new_with_label(this->innerConfigObject->lang_connectWindowButtonConnect.c_str());
-	
+	//Frame - little view improvement
 	GtkWidget * frame = gtk_frame_new(this->innerConfigObject->lang_connectWindowTitle.c_str());
 	gtk_grid_attach(GTK_GRID(connectWindowManager), label_host,0,0,1,1);
 	gtk_grid_attach(GTK_GRID(connectWindowManager), this->connectWindow_inputHost,1,0,1,1);
@@ -165,27 +158,12 @@ GtkWidget* ViewGuiBuilder::buildConnectWindowInterface(void) {
 	return frame;
 }
 
-void ViewGuiBuilder::connectWindowButtonConnectClicked(GtkWidget* button, gpointer* data) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	object->controlObject->connectWindowButtonConnectClicked(
-		std::string(gtk_entry_get_text(GTK_ENTRY(object->connectWindow_inputHost))),
-		std::string(gtk_entry_get_text(GTK_ENTRY(object->connectWindow_inputPort))),
-		std::string(gtk_entry_get_text(GTK_ENTRY(object->connectWindow_inputLogin))),
-		std::string(gtk_entry_get_text(GTK_ENTRY(object->connectWindow_inputPassword)))
-		);
-	object->destroyConnectWindow();
-}
-
 void ViewGuiBuilder::destroyConnectWindow(void) {
 	if(this->connectWindow != NULL) {
 		gtk_widget_destroy(this->connectWindow);
 		this->connectWindow = NULL;
 	}
 }
-	/*END
-	*<---connectWindow--->
-	*/
-
 
 void ViewGuiBuilder::spawnExceptionWindow(std::string message, ExceptionLevel errorLevel) {
 	GtkMessageType error;
@@ -201,14 +179,9 @@ void ViewGuiBuilder::spawnExceptionWindow(std::string message, ExceptionLevel er
 		break;
 	}
 	this->exceptionWindow = gtk_message_dialog_new(GTK_WINDOW(this->mainWindowHandler), GTK_DIALOG_DESTROY_WITH_PARENT, error, GTK_BUTTONS_OK, message.c_str());
-	g_signal_connect(this->exceptionWindow, "response",G_CALLBACK(this->exceptionWindowOkButton), this);
-	gtk_widget_show_all (this->exceptionWindow);
+	g_signal_connect(this->exceptionWindow, "response",G_CALLBACK(this->exceptionWindowOkButton), this); //Signal for windows destroy
+	gtk_widget_show_all(this->exceptionWindow);
 	gtk_dialog_run(GTK_DIALOG(this->exceptionWindow));
-}
-
-void ViewGuiBuilder::exceptionWindowOkButton(GtkDialog* dialog, gint id, gpointer* data) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	object->destroyExceptionWindow();
 }
 
 void ViewGuiBuilder::destroyExceptionWindow(void) {
@@ -229,10 +202,6 @@ void ViewGuiBuilder::showListInServerTree(std::list<ContainerFileInfo>* filesLis
 	this->doubleClick = false;
 	gtk_widget_show_all(this->mainWindowHandler);
 }
-
-
-
-
 
 void ViewGuiBuilder::activateDownloadButton() {
 	g_object_ref(this->buttonDownloadIconActive);
@@ -290,81 +259,6 @@ void ViewGuiBuilder::deactivateNewFolderButton() {
 	gtk_widget_set_sensitive(this->buttonNewFolder, false);
 }
 
-
-
-
-void ViewGuiBuilder::localTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	object->deactivateUploadButton();
-	object->deactivateDeleteButton();
-	object->doubleClick = true;
-	std::string cellName = object->fileListManagerObject->getNameFromClickedCell(treeview, path, true);
-	object->controlObject->localTreeCellDoubleClick(cellName);
-}
-
-void ViewGuiBuilder::serverTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	object->deactivateDownloadButton();
-	object->deactivateDeleteButton();
-	object->doubleClick = true;
-	std::string cellName = object->fileListManagerObject->getNameFromClickedCell(treeview, path, false);
-	object->controlObject->serverTreeCellDoubleClick(cellName);
-	
-}
-
-gboolean ViewGuiBuilder::serverTreeRowSelected (GtkTreeSelection *selection, GtkTreeModel *model, GtkTreePath *path,gboolean path_currently_selected,
-								gpointer userdata){
-	ViewGuiBuilder* object = (ViewGuiBuilder*)userdata;
-	object->serverCurrentFileSelected = object->fileListManagerObject->getFileFromSelectedCell(selection, model, path, false);
-	if(object->serverCurrentFileSelected != NULL && object->doubleClick != true) {
-		object->activateNewFolderButton();
-		object->activateDeleteButton();
-		if(object->serverCurrentFileSelected->isDir) {
-			object->deactivateDownloadButton();
-		} else {
-			object->activateDownloadButton();
-		}
-		object->lastSelectedLocal = false;
-	}
-	return TRUE;
-}
-
-gboolean ViewGuiBuilder::localTreeRowSelected (GtkTreeSelection *selection, GtkTreeModel *model, GtkTreePath *path,gboolean path_currently_selected,
-								gpointer userdata) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)userdata;
-	object->localCurrentFileSelected = object->fileListManagerObject->getFileFromSelectedCell(selection, model, path, true);
-	if(object->localCurrentFileSelected != NULL && object->doubleClick != true) {
-		object->activateNewFolderButton();
-		object->activateDeleteButton();
-		if(object->localCurrentFileSelected->isDir) {
-			object->deactivateUploadButton();
-		} else {
-			object->activateUploadButton();
-		}
-		object->lastSelectedLocal = true;
-	}
-	return TRUE;
-}
-
-void ViewGuiBuilder::deleteButtonClicked(GtkWidget *widget, gpointer data) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	if(object->lastSelectedLocal) {
-		object->controlObject->localDeleteButton(object->localCurrentFileSelected);
-	} else {
-		object->controlObject->serverDeleteButton(object->serverCurrentFileSelected);
-	}
-}
-
-void ViewGuiBuilder::newFolderButtonClicked(GtkWidget *widget, gpointer data) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	if(object->lastSelectedLocal) {
-		object->controlObject->localNewFolderButton();
-	} else {
-		object->controlObject->serverNewFolderButton();
-	}
-}
-
-
 bool ViewGuiBuilder::spawnAreYouSureWindow() {
 	GtkWidget *dialog;
 	dialog = gtk_dialog_new_with_buttons (this->innerConfigObject->lang_areYouSureWindowTitle.c_str(), GTK_WINDOW(this->mainWindowHandler), GTK_DIALOG_DESTROY_WITH_PARENT, ("OK"), GTK_RESPONSE_ACCEPT,("Cancel"),GTK_RESPONSE_REJECT,NULL);
@@ -402,34 +296,16 @@ std::string ViewGuiBuilder::spawnInsertNameWindow() {
 	}
 }
 
-ViewGuiBuilder::~ViewGuiBuilder(void){
-}
-
-
-void ViewGuiBuilder::downloadButtonClicked(GtkWidget *widget, gpointer data) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	object->controlObject->downloadButton(object->serverCurrentFileSelected);
-}
-
-void ViewGuiBuilder::uploadButtonClicked(GtkWidget *widget, gpointer data) {
-	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
-	object->controlObject->uploadButton(object->localCurrentFileSelected);
-}
-
 void ViewGuiBuilder::spawnProgressBar(bool download) {
 	this->downloadOrUpload = download;
-	this->deactivateDeleteButton();
-	this->deactivateDownloadButton();
-	this->deactivateNewFolderButton();
-	this->deactivateUploadButton();
 	this->progressBarDialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_widget_set_size_request(this->progressBarDialog, 600, 200);
+	gtk_widget_set_size_request(this->progressBarDialog, this->innerConfigObject->view_progressWindowWidth, this->innerConfigObject->view_progressWindowHeight);
 	GtkWidget* layoutManager = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(layoutManager), 20);
-	this->progressBarLabel = gtk_label_new("Progress");
+	this->progressBarLabel = gtk_label_new("0");
 	this->progressBarHandler = gtk_progress_bar_new();
 	gtk_widget_set_hexpand(this->progressBarHandler, TRUE);
-	this->progressBarCancelButton = gtk_button_new_with_label("Cancel");
+	this->progressBarCancelButton = gtk_button_new_with_label(this->innerConfigObject->lang_progressBarCancelButton.c_str());
 	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarLabel,0,0,3,1);
 	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarHandler,0,1,3,1);
 	gtk_grid_attach(GTK_GRID(layoutManager), this->progressBarCancelButton,1,2,1,1);
@@ -437,14 +313,11 @@ void ViewGuiBuilder::spawnProgressBar(bool download) {
 	gtk_widget_show_all (this->progressBarDialog);
 	g_signal_connect(this->progressBarDialog, "delete-event",G_CALLBACK(this->progressBarWindowCloseButtonClicked), this);
 	g_signal_connect(this->progressBarCancelButton, "clicked",G_CALLBACK(this->progressBarCancelButtonClicked), this);
+	gtk_widget_set_sensitive(this->mainWindowHandler, false);
 }
 
 std::function<void(double)> ViewGuiBuilder::getProgressBarCallback() {
 	return std::bind(&ViewGuiBuilder::progressBarSetProgress, this, std::placeholders::_1);
-}
-
-void ViewGuiBuilder::progressBarSetProgress(double set) {
-	this->progress = set;
 }
 
 void ViewGuiBuilder::refreshProgressBar() {
@@ -458,14 +331,137 @@ void ViewGuiBuilder::refreshProgressBar() {
 	}
 }
 
+void ViewGuiBuilder::endTransfer() {
+	this->progress = 0;
+	if(this->progressBarDialog != NULL) {
+		gtk_widget_destroy(this->progressBarDialog);
+		this->progressBarDialog = NULL;
+		gtk_widget_set_sensitive(this->mainWindowHandler, true);
+	}
+}
+
+
+void ViewGuiBuilder::progressBarSetProgress(double set) {
+	this->progress = set;
+}
+
+void ViewGuiBuilder::connectWindowButtonConnectClicked(GtkWidget* button, gpointer* data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->controlObject->connectWindowButtonConnectClicked(
+		std::string(gtk_entry_get_text(GTK_ENTRY(object->connectWindow_inputHost))),
+		std::string(gtk_entry_get_text(GTK_ENTRY(object->connectWindow_inputPort))),
+		std::string(gtk_entry_get_text(GTK_ENTRY(object->connectWindow_inputLogin))),
+		std::string(gtk_entry_get_text(GTK_ENTRY(object->connectWindow_inputPassword)))
+		);
+	object->destroyConnectWindow();
+}
+
+void ViewGuiBuilder::mainWindowMenuBarButtonConnectClicked(GtkWidget* object, gpointer* data) {
+	ViewGuiBuilder* guiObject = (ViewGuiBuilder*)data;
+
+	if(guiObject->connectWindow == NULL) {
+		guiObject->spawnConnectWindow();
+	} else {
+		gtk_widget_destroy(guiObject->connectWindow);
+		guiObject->spawnConnectWindow();
+	}
+}
+
+void ViewGuiBuilder::exceptionWindowOkButton(GtkDialog* dialog, gint id, gpointer* data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->destroyExceptionWindow();
+}
+
+
+void ViewGuiBuilder::deleteButtonClicked(GtkWidget *widget, gpointer data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	if(object->lastSelectedLocal) {
+		object->controlObject->localDeleteButton(object->localCurrentFileSelected);
+	} else {
+		object->controlObject->serverDeleteButton(object->serverCurrentFileSelected);
+	}
+}
+
+void ViewGuiBuilder::newFolderButtonClicked(GtkWidget *widget, gpointer data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	if(object->lastSelectedLocal) {
+		object->controlObject->localNewFolderButton();
+	} else {
+		object->controlObject->serverNewFolderButton();
+	}
+}
+
+gboolean ViewGuiBuilder::serverTreeRowSelected (GtkTreeSelection *selection, GtkTreeModel *model, GtkTreePath *path,gboolean path_currently_selected,
+								gpointer userdata){
+	ViewGuiBuilder* object = (ViewGuiBuilder*)userdata;
+	object->serverCurrentFileSelected = object->fileListManagerObject->getFileFromSelectedCell(selection, model, path, false);
+	if(object->serverCurrentFileSelected != NULL && object->doubleClick != true) {
+		object->activateNewFolderButton();
+		object->activateDeleteButton();
+		if(object->serverCurrentFileSelected->isDir) {
+			object->deactivateDownloadButton();
+		} else {
+			object->activateDownloadButton();
+		}
+		object->lastSelectedLocal = false;
+	}
+	return TRUE;
+}
+
+gboolean ViewGuiBuilder::localTreeRowSelected (GtkTreeSelection *selection, GtkTreeModel *model, GtkTreePath *path,gboolean path_currently_selected,
+								gpointer userdata) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)userdata;
+	object->localCurrentFileSelected = object->fileListManagerObject->getFileFromSelectedCell(selection, model, path, true);
+	if(object->localCurrentFileSelected != NULL && object->doubleClick != true) {
+		object->activateNewFolderButton();
+		object->activateDeleteButton();
+		if(object->localCurrentFileSelected->isDir) {
+			object->deactivateUploadButton();
+		} else {
+			object->activateUploadButton();
+		}
+		object->lastSelectedLocal = true;
+	}
+	return TRUE;
+}
+
+void ViewGuiBuilder::localTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->deactivateUploadButton();
+	object->deactivateDeleteButton();
+	object->doubleClick = true;
+	std::string cellName = object->fileListManagerObject->getNameFromClickedCell(treeview, path, true);
+	object->controlObject->localTreeCellDoubleClick(cellName);
+}
+
+void ViewGuiBuilder::serverTreeRowDoubleClick(GtkTreeView *treeview, GtkTreePath *path, GtkTreeViewColumn *col, gpointer* data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->deactivateDownloadButton();
+	object->deactivateDeleteButton();
+	object->doubleClick = true;
+	std::string cellName = object->fileListManagerObject->getNameFromClickedCell(treeview, path, false);
+	object->controlObject->serverTreeCellDoubleClick(cellName);
+	
+}
+
+void ViewGuiBuilder::downloadButtonClicked(GtkWidget *widget, gpointer data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->controlObject->downloadButton(object->serverCurrentFileSelected);
+}
+
+void ViewGuiBuilder::uploadButtonClicked(GtkWidget *widget, gpointer data) {
+	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
+	object->controlObject->uploadButton(object->localCurrentFileSelected);
+}
+
+
 void ViewGuiBuilder::progressBarWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data) {
 	ViewGuiBuilder* This = (ViewGuiBuilder*)data;
 	if(This->downloadOrUpload) {
 		This->controlObject->cancelDownload();
 	} else {
-
+		This->controlObject->cancelUpload();
 	}
-	gtk_widget_destroy(This->progressBarDialog);
 }
 
 void ViewGuiBuilder::progressBarCancelButtonClicked(GtkWidget *widget, gpointer data) {
@@ -473,9 +469,8 @@ void ViewGuiBuilder::progressBarCancelButtonClicked(GtkWidget *widget, gpointer 
 	if(This->downloadOrUpload) {
 		This->controlObject->cancelDownload();
 	} else {
-
+		This->controlObject->cancelUpload();
 	}
-	gtk_widget_destroy(This->progressBarDialog);
 }
 
 void ViewGuiBuilder::mainWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data) {
@@ -484,14 +479,3 @@ void ViewGuiBuilder::mainWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* e
 	gtk_widget_destroy(This->mainWindowHandler);
 }
 
-void ViewGuiBuilder::endTransfer() {
-	this->progress = 0;
-	if(this->progressBarDialog != NULL) {
-		gtk_widget_destroy(this->progressBarDialog);
-		this->progressBarDialog = NULL;
-		this->activateDeleteButton();
-		this->activateDownloadButton();
-		this->activateNewFolderButton();
-		this->activateUploadButton();
-	}
-}

@@ -19,6 +19,7 @@ ModelDAO::ModelDAO(InnerConfig* innerConfigObject):innerConfigObject(innerConfig
 
 
 ModelDAO::~ModelDAO(void){
+	delete(this->connectionObject);
 }
 
 std::list<ContainerFileInfo>* ModelDAO::getLogicalDrives(void) {

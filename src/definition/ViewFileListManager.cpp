@@ -131,7 +131,6 @@ GtkWidget* ViewFileListManager::createFilesListLocal(void) {
 		this->localStoreList = gtk_list_store_new(5, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT);
 	}
 	gtk_tree_view_set_model(GTK_TREE_VIEW(this->treeLocal),GTK_TREE_MODEL(this->localStoreList));
-
 	GtkWidget* scroll = gtk_scrolled_window_new( NULL,NULL );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( scroll ),GTK_POLICY_AUTOMATIC,GTK_POLICY_AUTOMATIC );
 	gtk_container_add( GTK_CONTAINER( scroll ),this->treeLocal );

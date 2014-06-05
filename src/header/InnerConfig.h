@@ -16,6 +16,7 @@ public:
 
 	std::string view_dirIconSrc;
 	std::string view_fileIconSrc;
+	std::string view_mainIconPath;
 
 	std::string view_buttonDownloadActiveIconSrc;
 	std::string view_buttonDownloadInactiveIconSrc;
@@ -36,6 +37,9 @@ public:
 	int view_insertNameWindowWidth;
 	int view_insertNameWindowHeight;
 
+	int view_progressWindowWidth;
+	int view_progressWindowHeight;
+
 	std::string view_exceptionWindowIconSrcStandard;
 	std::string view_exceptionWindowIconSrcHigh;
 	std::string view_exceptionWindowIconSrcCritical;
@@ -44,6 +48,7 @@ public:
 
 	std::string lang_mainWindowTitle;
 	std::string lang_mainWindowMenuConnectButtonText;
+	std::string lang_mainWindowMenuDisconnectButtonText;
 	std::string lang_connectWindowTitle;
 	std::string lang_connectWindowLabelHost;
 	std::string lang_connectWindowLabelPort;
@@ -66,6 +71,8 @@ public:
 	std::string lang_filesListFile;
 
 	std::string lang_areYouSureWindowTitle;
+
+	std::string lang_progressBarCancelButton;
 
 	std::string lang_insertNameWindowTitle;
 	std::string lang_insertNameWindowLabel;
@@ -97,6 +104,7 @@ public:
 
 		view_dirIconSrc = std::string("img/dirIcon.png");
 		view_fileIconSrc = std::string("img/fileIcon.png");
+		view_mainIconPath = std::string("img/icon.png");
 
 		view_buttonDownloadActiveIconSrc = std::string("img/arrowright_active.png");
 		view_buttonDownloadInactiveIconSrc = std::string("img/arrowright_inactive.png");
@@ -116,6 +124,9 @@ public:
 		view_insertNameWindowWidth = 220;
 		view_insertNameWindowHeight = 60;
 
+		view_progressWindowWidth = 600;
+		view_progressWindowHeight = 200;
+
 		view_exceptionWindowIconSrcStandard = std::string("src");
 		view_exceptionWindowIconSrcHigh = std::string("src");
 		view_exceptionWindowIconSrcCritical = std::string("src");
@@ -123,7 +134,8 @@ public:
 		model_maxNumberOfConnections = 8;
 
 		lang_mainWindowTitle = std::string("FtpClient - connect to your server.");
-		lang_mainWindowMenuConnectButtonText = std::string("Connect...");
+		lang_mainWindowMenuConnectButtonText = std::string("Connect");
+		lang_mainWindowMenuDisconnectButtonText = std::string("Disconnect");
 		lang_connectWindowTitle = std::string("Connect");
 		lang_connectWindowLabelHost = std::string("Host:");
 		lang_connectWindowLabelPort = std::string("Port:");
@@ -147,6 +159,8 @@ public:
 		lang_filesListFile = std::string("File");
 
 		lang_areYouSureWindowTitle = std::string("Are you sure?");
+
+		lang_progressBarCancelButton = std::string("Cancel");
 
 		lang_insertNameWindowTitle = std::string("Insert name of directory");
 		lang_insertNameWindowLabel = std::string("Name: ");

@@ -22,60 +22,51 @@ public:
 
 
 	/*
-	* INTERFACE
-	* Return list of logical drives on user PC. Each vector is letter of drive like A, B, C...
-	* return: list of logical drives in linked list of ContainerFileInfo with values:
-	*		  fileName = get 
-	*		  filePath = get
-	*		  fileSize = -1
-	*		  day = -1
-	*		  month = -1
-	*		  year = -1
-	*		  hour = -1
-	*		  minute = -1
-	*		  isDir = true
-	*		  attributes = -1
-	*		  
+	* OVERRIDE
+	* <summary>Return list of logical drives on user PC. Each vector is letter of drive like A, B, C...</summary>
+	* <returns>list of logical drives in linked list of ContainerFileInfo with values:
+			  fileName = get 
+			  filePath = get
+			  fileSize = -1
+			  day = -1
+			  month = -1
+			  year = -1
+			  hour = -1
+			  minute = -1
+			  isDir = true
+			  attributes = -1
+	  </returns>		  
 	*/
 	std::list<ContainerFileInfo>* getLogicalDrives(void);
 
 	/*
-	* Convert bit representation of logical drives to letters.
-	* params:
-	*	*volumesList - 32 bit integer represents list of volumes on user PC. First bit means A, second B, third C....
-	*/
-	std::vector<std::string> convertLogicalDrives(DWORD volumesList);
-
-
-	/*
-	* INTERFACE
-	* Get info from local disk
-	* return: Return list of files/folders in path directory
-	* throws: ContainerException if cannot read path directory
+	* OVERRIDE
+	* <summary>Get info from local disk</summary>
+	* <param name="path">Information about cell</param>
+	* <returns>Return list of files/folders in path directory</returns>
+	* <exception cref="ContainerException">Throw if cannot read path directory</exception>
 	*/
 	std::list<ContainerFileInfo>* getDirectoryContent(std::string path);
 
 	
 	/*
-	* INTERFACE
-	* Order files list, first sorted by name directories, then sorted by name files
-	* return: Return ordered list of files/folder in path directory
+	* OVERRIDE
+	* <summary>Order files list, first sorted by name directories, then sorted by name files</summary>
+	* <returns>Return ordered list of files/folder in path directory</returns>
 	*/
 	std::list<ContainerFileInfo>* orderFilesListDirecrotiesFiles(std::list<ContainerFileInfo>* listToOrder);
 
 	/*
-	* INTERFACE
-	* Check if path is logical partition
-	* return:
-	*		true - path is like: X:/
-	*		false - path is like X:/dir/dir/...
+	* OVERRIDE
+	* <summary>Check if path is logical partition</summary>
+	* <returns>true - path is like: X:/ false - path is like X:/dir/dir/...</returns>
 	*/
 	bool isPathLogicalPartition(std::string path);
 
 	/*
-	* INTERFACE
-	* Delete last '/' in path, then find last occurence of '/' and cut directory name
-	* return: new path
+	* OVERRIDE
+	* <summary>Delete last '/' in path, then find last occurence of '/' and cut directory name</summary>
+	* <returns>new path</returns>
 	*/
 	std::string goUpInDirPath(std::string path);
 
@@ -130,6 +121,14 @@ public:
 	virtual void uploadFile(std::string serverPath, std::string localPath, std::string name, uint64_t size, std::function<void(double)> progressBarCallback, std::function<void(int)> endUploadCallback);
 
 	virtual void killTransferThread();
+
+	
+	/*
+	* Convert bit representation of logical drives to letters.
+	* params:
+	*	*volumesList - 32 bit integer represents list of volumes on user PC. First bit means A, second B, third C....
+	*/
+	std::vector<std::string> convertLogicalDrives(DWORD volumesList);
 private:
 	InnerConfig* innerConfigObject;
 	ModelConnection* connectionObject;

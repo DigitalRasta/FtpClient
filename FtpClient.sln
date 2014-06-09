@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FtpClient", "FtpClient.vcxproj", "{A023F7FC-44FF-4D8C-92FA-C72D1DF28482}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{4D27EE63-14FF-40CD-9660-8E76931B9411}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,10 +13,6 @@ Global
 		{A023F7FC-44FF-4D8C-92FA-C72D1DF28482}.Debug|Win32.Build.0 = Debug|Win32
 		{A023F7FC-44FF-4D8C-92FA-C72D1DF28482}.Release|Win32.ActiveCfg = Release|Win32
 		{A023F7FC-44FF-4D8C-92FA-C72D1DF28482}.Release|Win32.Build.0 = Release|Win32
-		{4D27EE63-14FF-40CD-9660-8E76931B9411}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4D27EE63-14FF-40CD-9660-8E76931B9411}.Debug|Win32.Build.0 = Debug|Win32
-		{4D27EE63-14FF-40CD-9660-8E76931B9411}.Release|Win32.ActiveCfg = Release|Win32
-		{4D27EE63-14FF-40CD-9660-8E76931B9411}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

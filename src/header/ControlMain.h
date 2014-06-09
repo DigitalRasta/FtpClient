@@ -26,6 +26,8 @@ public:
 	*/
 	virtual void connectWindowButtonConnectClicked(std::string host, std::string port, std::string login, std::string password);
 
+	virtual void disconnectButtonClicked();
+
 	virtual void localTreeCellDoubleClick(std::string cellName);
 
 	virtual void serverTreeCellDoubleClick(std::string cellName);
@@ -59,7 +61,9 @@ private:
 	ViewGuiBuilderInterface* viewGuiBuilderObject;
 	ModelDAOInterface* modelDAOObject;
 	InnerConfig* innerConfigObject;
-	ControlExceptionManager exceptionManagerObject;
+	ControlExceptionManager* exceptionManagerObject;
+
+	bool connected;
 
 	std::list<ContainerFileInfo>* localFilesList;
 	std::list<ContainerFileInfo>* serverFilesList;

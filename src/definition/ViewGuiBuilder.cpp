@@ -29,6 +29,7 @@ ViewGuiBuilder::ViewGuiBuilder(InnerConfig* innerConfigObject): innerConfigObjec
 }
 
 ViewGuiBuilder::~ViewGuiBuilder(void){
+	delete this->fileListManagerObject;
 }
 
 void ViewGuiBuilder::initializeMainWindow(void) {
@@ -61,9 +62,9 @@ void ViewGuiBuilder::buildInterface(void) {
 	this->menuBar = gtk_menu_bar_new();
 	this->connectButton =  gtk_menu_item_new_with_label(this->innerConfigObject->lang_mainWindowMenuConnectButtonText.c_str());
 	this->disconnectButton =  gtk_menu_item_new_with_label(this->innerConfigObject->lang_mainWindowMenuDisconnectButtonText.c_str());
+	this->deactivateDisconnectButton();
 	gtk_menu_shell_append(GTK_MENU_SHELL(this->menuBar), this->connectButton);
 	gtk_menu_shell_append(GTK_MENU_SHELL(this->menuBar), this->disconnectButton);
-	gtk_widget_set_sensitive(this->disconnectButton, false);
 	gtk_widget_set_hexpand(this->menuBar, TRUE);
 	//Add menu, lists and buttons to main window layout manager
 	gtk_grid_attach(GTK_GRID(this->layoutManager), this->menuBar,0,0,3,1);
@@ -72,6 +73,7 @@ void ViewGuiBuilder::buildInterface(void) {
 	gtk_grid_attach(GTK_GRID(this->layoutManager), this->createStandardButtons(),1,2,1,1);
 	
 	g_signal_connect(this->connectButton, "activate", G_CALLBACK(this->mainWindowMenuBarButtonConnectClicked), this);
+	g_signal_connect(this->disconnectButton, "activate", G_CALLBACK(this->mainWindowMenuBarButtonDisconnectClicked), this);
 	g_signal_connect(this->fileListManagerObject->getLocalTreeHandler(), "row-activated", G_CALLBACK(this->localTreeRowDoubleClick), this);
 	g_signal_connect(this->fileListManagerObject->getServerTreeHandler(), "row-activated", G_CALLBACK(this->serverTreeRowDoubleClick), this);
 	//Set lists selection setting to only one row
@@ -259,6 +261,22 @@ void ViewGuiBuilder::deactivateNewFolderButton() {
 	gtk_widget_set_sensitive(this->buttonNewFolder, false);
 }
 
+void ViewGuiBuilder::activateConnectButton() {
+	gtk_widget_set_sensitive(this->connectButton, true);
+}
+
+void ViewGuiBuilder::deactivateConnectButton() {
+	gtk_widget_set_sensitive(this->connectButton, false);
+}
+
+void ViewGuiBuilder::activateDisconnectButton() {
+	gtk_widget_set_sensitive(this->disconnectButton, true);
+}
+
+void ViewGuiBuilder::deactivateDisconnectButton() {
+	gtk_widget_set_sensitive(this->disconnectButton, false);
+}
+
 bool ViewGuiBuilder::spawnAreYouSureWindow() {
 	GtkWidget *dialog;
 	dialog = gtk_dialog_new_with_buttons (this->innerConfigObject->lang_areYouSureWindowTitle.c_str(), GTK_WINDOW(this->mainWindowHandler), GTK_DIALOG_DESTROY_WITH_PARENT, ("OK"), GTK_RESPONSE_ACCEPT,("Cancel"),GTK_RESPONSE_REJECT,NULL);
@@ -340,7 +358,6 @@ void ViewGuiBuilder::endTransfer() {
 	}
 }
 
-
 void ViewGuiBuilder::progressBarSetProgress(double set) {
 	this->progress = set;
 }
@@ -367,11 +384,15 @@ void ViewGuiBuilder::mainWindowMenuBarButtonConnectClicked(GtkWidget* object, gp
 	}
 }
 
+void ViewGuiBuilder::mainWindowMenuBarButtonDisconnectClicked(GtkWidget* object, gpointer* data) {
+	ViewGuiBuilder* guiObject = (ViewGuiBuilder*)data;
+	guiObject->controlObject->disconnectButtonClicked();
+}
+
 void ViewGuiBuilder::exceptionWindowOkButton(GtkDialog* dialog, gint id, gpointer* data) {
 	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
 	object->destroyExceptionWindow();
 }
-
 
 void ViewGuiBuilder::deleteButtonClicked(GtkWidget *widget, gpointer data) {
 	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
@@ -453,7 +474,6 @@ void ViewGuiBuilder::uploadButtonClicked(GtkWidget *widget, gpointer data) {
 	ViewGuiBuilder* object = (ViewGuiBuilder*)data;
 	object->controlObject->uploadButton(object->localCurrentFileSelected);
 }
-
 
 void ViewGuiBuilder::progressBarWindowCloseButtonClicked(GtkWidget* widget, GdkEvent* events, gpointer data) {
 	ViewGuiBuilder* This = (ViewGuiBuilder*)data;

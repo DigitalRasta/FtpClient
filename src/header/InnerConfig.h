@@ -100,7 +100,7 @@ public:
 	InnerConfig(void) {
 		view_mainWindowWidth = 800;
 		view_mainWindowHeight = 500;
-		view_mainWindowBackground = "#FF0000";
+		view_mainWindowBackground = "#a9dbf6";
 
 		view_dirIconSrc = std::string("img/dirIcon.png");
 		view_fileIconSrc = std::string("img/fileIcon.png");
@@ -125,7 +125,7 @@ public:
 		view_insertNameWindowHeight = 60;
 
 		view_progressWindowWidth = 600;
-		view_progressWindowHeight = 200;
+		view_progressWindowHeight = 150;
 
 		view_exceptionWindowIconSrcStandard = std::string("src");
 		view_exceptionWindowIconSrcHigh = std::string("src");

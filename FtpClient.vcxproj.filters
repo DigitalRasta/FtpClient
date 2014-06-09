@@ -30,9 +30,6 @@
     <ClCompile Include="src\definition\ViewGuiBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\definition\ControlConnectionManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\definition\ControlExceptionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,9 +66,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\header\ViewGuiBuilderInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\header\ControlConnectionManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\header\ControlExceptionManager.h">

@@ -13,32 +13,20 @@
 #include <future>
 using namespace FtpClient;
 
-ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject), exceptionManagerObject(viewGuiBuilderObject, innerConfigObject){
+ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject){
+	this->exceptionManagerObject = new ControlExceptionManager(viewGuiBuilderObject, innerConfigObject, this);
 	this->localFilesList = NULL;
 	this->transferEnd = false;
 	this->programEnd = false;
+	this->connected = false;
 }
 
 void ControlMain::startFtpClient(void) {
 	this->viewGuiBuilderObject->initializeMainWindow();
 	this->viewGuiBuilderObject->bindMainWindowEvents(this);
-	this->initLocalBrowser("F:/test");
-	try {
-		this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
-	} catch (ContainerException &e) {
-		this->viewGuiBuilderObject->spawnExceptionWindow("Error", e.level);
-	}
-	try {
-		std::list<ContainerFileInfo>* filesList = this->modelDAOObject->serverGetDirectoryContent("/");
-		this->serverFilesList = filesList;
-		this->viewGuiBuilderObject->showListInServerTree(filesList);
-		//this->viewGuiBuilderObject->showListInLocalTree();
-	} catch (ContainerException &e) {
-		this->viewGuiBuilderObject->spawnExceptionWindow("Error2", e.level);
-	}
-	//this->viewGuiBuilderObject->spawnExceptionWindow("ERROR!", ExceptionLevel::EXCEPTIONLEVEL_CRITICAL);
-	//this->viewGuiBuilderObject->spawnConnectWindow();
-
+	this->initLocalBrowser(" ");
+	this->viewGuiBuilderObject->activateConnectButton();
+	this->viewGuiBuilderObject->deactivateDisconnectButton();
 }
 
 
@@ -54,7 +42,33 @@ void ControlMain::initLocalBrowser(std::string startPath) {
 
 
 void ControlMain::connectWindowButtonConnectClicked(std::string host, std::string port, std::string login, std::string password) {
+	try {
+		this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
+		//this->modelDAOObject->createNewConnection("ftp.swfwmd.state.fl.us", "21", "anonymous", "anonymous@email.com");
+		//this->modelDAOObject->createNewConnection(host,port,login,password);
+	} catch (ContainerException &e) {
+		this->exceptionManagerObject->manageException(e);return;
+	}
+	try {
+		std::list<ContainerFileInfo>* filesList = this->modelDAOObject->serverGetDirectoryContent("/");
+		this->serverFilesList = filesList;
+		this->viewGuiBuilderObject->showListInServerTree(filesList);
+	} catch (ContainerException &e) {
+		this->exceptionManagerObject->manageException(e);return;
+	}
+	this->connected = true;
+	this->viewGuiBuilderObject->deactivateConnectButton();
+	this->viewGuiBuilderObject->activateDisconnectButton();
+}
 
+void ControlMain::disconnectButtonClicked() {
+	if(this->connected) {
+		delete this->serverFilesList;
+		this->viewGuiBuilderObject->showListInServerTree(NULL);
+		this->viewGuiBuilderObject->activateConnectButton();
+		this->viewGuiBuilderObject->deactivateDisconnectButton();
+		this->connected = false;
+	}
 }
 
 void ControlMain::localTreeCellDoubleClick(std::string name) {
@@ -69,7 +83,7 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 				this->localFilesList = this->modelDAOObject->getDirectoryContent(this->modelDAOObject->goUpInDirPath(fileObject.filePath));
 				delete(old);
 			} catch (ContainerException &e) {
-				this->exceptionManagerObject.manageException(e);
+				this->exceptionManagerObject->manageException(e);return;
 			}
 		}
 	} else {
@@ -86,14 +100,14 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 					this->localFilesList = this->modelDAOObject->getDirectoryContent(fileObject.filePath);
 					delete(old);
 				} catch (ContainerException &e) {
-					this->exceptionManagerObject.manageException(e);
+					this->exceptionManagerObject->manageException(e);return;
 				}
 			} else {
 				try {
 					this->localFilesList = this->modelDAOObject->getDirectoryContent((fileObject.filePath + fileObject.fileName));
 					delete(old);
 				} catch (ContainerException &e) {
-					this->exceptionManagerObject.manageException(e);
+					this->exceptionManagerObject->manageException(e);return;
 				}
 			}
 		} else {
@@ -113,7 +127,7 @@ void ControlMain::serverTreeCellDoubleClick(std::string name) {
 		try {
 			this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent(this->modelDAOObject->goUpInDirPath(fileObject.filePath));
 		} catch (ContainerException &e) {
-			this->exceptionManagerObject.manageException(e);
+			this->exceptionManagerObject->manageException(e);return;
 		}
 	} else {
 		ContainerFileInfo fileObject = (*this->serverFilesList).front();
@@ -127,7 +141,7 @@ void ControlMain::serverTreeCellDoubleClick(std::string name) {
 			try {
 				this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent((fileObject.filePath + fileObject.fileName + "/"));
 			} catch (ContainerException &e) {
-				this->exceptionManagerObject.manageException(e);
+				this->exceptionManagerObject->manageException(e);return;
 			}
 		} else {
 			//TODO
@@ -169,6 +183,9 @@ void ControlMain::localDeleteButton(ContainerFileInfo* file) {
 
 void ControlMain::localNewFolderButton() {
 	std::string name = this->viewGuiBuilderObject->spawnInsertNameWindow();
+	if(name.size() == 0) {
+		return;
+	}
 	for(int i = 0; i < name.size(); i++) {
 		if(name[i] < 0) {
 			this->viewGuiBuilderObject->spawnExceptionWindow(this->innerConfigObject->exception_specialCharsNotSupported, ExceptionLevel::EXCEPTIONLEVEL_STANDARD);
@@ -203,7 +220,7 @@ void ControlMain::refreshLocalTree(std::string path) {
 	try {
 		this->localFilesList = this->modelDAOObject->getDirectoryContent(path);
 	} catch (ContainerException &e) {
-		this->exceptionManagerObject.manageException(e);
+		this->exceptionManagerObject->manageException(e);return;
 	}
 	this->localFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->localFilesList);
 	this->viewGuiBuilderObject->showListInLocalTree(this->localFilesList);
@@ -214,7 +231,7 @@ void ControlMain::refreshServerTree(std::string path) {
 		this->serverFilesList = this->modelDAOObject->serverGetDirectoryContent(path);
 		
 	} catch (ContainerException &e) {
-		this->exceptionManagerObject.manageException(e);
+		this->exceptionManagerObject->manageException(e);return;
 	}
 	this->serverFilesList = this->modelDAOObject->orderFilesListDirecrotiesFiles(this->serverFilesList);
 	this->viewGuiBuilderObject->showListInServerTree(this->serverFilesList);
@@ -229,7 +246,7 @@ void ControlMain::downloadButton(ContainerFileInfo* fileServer) {
 		this->modelDAOObject->downloadFile(fileServer->filePath, this->localFilesList->front().filePath, fileServer->fileName, fileServer->fileSize, progressCallback, std::bind(&ControlMain::endTransferCallback, this, std::placeholders::_1));
 	} catch (ContainerException &e) {
 		this->viewGuiBuilderObject->endTransfer();
-		this->exceptionManagerObject.manageException(e);
+		this->exceptionManagerObject->manageException(e);return;
 	}
 }
 
@@ -243,7 +260,7 @@ void ControlMain::checkTransferEnd() {
 	if(this->transferEnd == true) {
 		if(this->lastTransferCode != 0) {
 			this->modelDAOObject->deleteLocalFile(&ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileTransfer->fileName, 0));
-			this->exceptionManagerObject.manageException(ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, (ExceptionCode)this->lastTransferCode));
+			this->exceptionManagerObject->manageException(ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, (ExceptionCode)this->lastTransferCode));
 		}
 		this->refreshLocalTree(this->localFilesList->front().filePath);
 		this->refreshServerTree(this->serverFilesList->front().filePath);
@@ -260,7 +277,7 @@ void ControlMain::cancelDownload() {
 	try {
 		this->modelDAOObject->killTransferThread();
 	} catch (ContainerException &e) {
-		this->exceptionManagerObject.manageException(e);
+		this->exceptionManagerObject->manageException(e);return;
 	}
 	ContainerFileInfo fileToDelete = ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileTransfer->fileName, 0, false, -1, -1, -1, -1, -1, 0);
 	this->modelDAOObject->deleteLocalFile(&fileToDelete);
@@ -271,7 +288,7 @@ void ControlMain::cancelUpload() {
 	try {
 		this->modelDAOObject->killTransferThread();
 	} catch (ContainerException &e) {
-		this->exceptionManagerObject.manageException(e);
+		this->exceptionManagerObject->manageException(e);return;
 	}
 	//ContainerFileInfo fileToDelete = ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileTransfer->fileName, 0, false, -1, -1, -1, -1, -1, 0);
 	//this->modelDAOObject->deleteLocalFile(&fileToDelete);
@@ -279,15 +296,17 @@ void ControlMain::cancelUpload() {
 }
 
 void ControlMain::uploadButton(ContainerFileInfo* fileLocal) {
-	this->downloadOrUpload = false;
-	this->viewGuiBuilderObject->spawnProgressBar(false);
-	this->lastFileTransfer = fileLocal;
-	std::function<void(double)> progressCallback = this->viewGuiBuilderObject->getProgressBarCallback();
-	try {
-		this->modelDAOObject->uploadFile(this->serverFilesList->front().filePath, fileLocal->filePath, fileLocal->fileName, fileLocal->fileSize, progressCallback, std::bind(&ControlMain::endTransferCallback, this, std::placeholders::_1));
-	} catch (ContainerException &e) {
-		this->viewGuiBuilderObject->endTransfer();
-		this->exceptionManagerObject.manageException(e);
+	if(this->connected) {
+		this->downloadOrUpload = false;
+		this->viewGuiBuilderObject->spawnProgressBar(false);
+		this->lastFileTransfer = fileLocal;
+		std::function<void(double)> progressCallback = this->viewGuiBuilderObject->getProgressBarCallback();
+		try {
+			this->modelDAOObject->uploadFile(this->serverFilesList->front().filePath, fileLocal->filePath, fileLocal->fileName, fileLocal->fileSize, progressCallback, std::bind(&ControlMain::endTransferCallback, this, std::placeholders::_1));
+		} catch (ContainerException &e) {
+			this->viewGuiBuilderObject->endTransfer();
+			this->exceptionManagerObject->manageException(e);return;
+		}
 	}
 }
 

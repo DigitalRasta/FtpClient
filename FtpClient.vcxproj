@@ -59,6 +59,7 @@
       </AdditionalIncludeDirectories>
       <AdditionalOptions>-IF:/projekty/CPP/GTK/include/gtk-3.0 -IF:/projekty/CPP/GTK/include/cairo -IF:/projekty/CPP/GTK/include/pango-1.0 -IF:/projekty/CPP/GTK/include/atk-1.0 -IF:/projekty/CPP/GTK/include/cairo -IF:/projekty/CPP/GTK/include/pixman-1 -IF:/projekty/CPP/GTK/include -IF:/projekty/CPP/GTK/include/freetype2 -IF:/projekty/CPP/GTK/include -IF:/projekty/CPP/GTK/include/libpng15 -IF:/projekty/CPP/GTK/include/gdk-pixbuf-2.0 -IF:/projekty/CPP/GTK/include/libpng15 -IF:/projekty/CPP/GTK/include/glib-2.0 -IF:/projekty/CPP/GTK/lib/glib-2.0/include 
  %(AdditionalOptions)</AdditionalOptions>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -68,6 +69,9 @@
       <AdditionalLibraryDirectories>F:\projekty\CPP\Libcurl\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>curllib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -87,7 +91,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\definition\ControlConnectionManager.cpp" />
     <ClCompile Include="src\definition\ControlExceptionManager.cpp" />
     <ClCompile Include="src\definition\ControlMain.cpp" />
     <ClCompile Include="src\definition\ModelConnection.cpp" />
@@ -99,7 +102,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\header\ContainerFileInfo.h" />
-    <ClInclude Include="src\header\ControlConnectionManager.h" />
     <ClInclude Include="src\header\ControlExceptionManager.h" />
     <ClInclude Include="src\header\ControlMain.h" />
     <ClInclude Include="src\header\ControlMainEventsInterface.h" />

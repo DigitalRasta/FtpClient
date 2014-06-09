@@ -15,6 +15,7 @@
 using namespace FtpClient;
 ModelDAO::ModelDAO(InnerConfig* innerConfigObject):innerConfigObject(innerConfigObject){
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	this->connectionObject = NULL;
 }
 
 
@@ -129,6 +130,12 @@ std::string ModelDAO::goUpInDirPath(std::string path) {
 
 
 void ModelDAO::createNewConnection(std::string host, std::string port, std::string login, std::string password) {
+	if(this->connectionObject != NULL) {
+		delete this->connectionObject;
+	}
+	if(host.empty() || port.empty() || login.empty() || password.empty()) {
+		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_STANDARD, ExceptionCode::EXCEPTION_INVALID_PARAMS);
+	}
 	this->connectionObject = new ModelConnection(host, port, login, password, this->innerConfigObject);
 }
 

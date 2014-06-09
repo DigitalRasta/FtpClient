@@ -128,6 +128,30 @@ public:
 
 	/*
 	* OVERRIDE
+	* <summary>Activate button</summary>
+	*/
+	void activateConnectButton();
+
+	/*
+	* OVERRIDE
+	* <summary>Deactivate button</summary>
+	*/
+	void deactivateConnectButton();
+
+	/*
+	* OVERRIDE
+	* <summary>Activate button</summary>
+	*/
+	void activateDisconnectButton();
+
+	/*
+	* OVERRIDE
+	* <summary>Deactivate button</summary>
+	*/
+	void deactivateDisconnectButton();
+
+	/*
+	* OVERRIDE
 	* <summary>Spawn dialog with 2 buttons: OK and CANCEL. Block main window events.</summary>
 	* <returns> True if answer was: OK
 	*			False if answer was: CANCEL </returns>
@@ -166,6 +190,14 @@ public:
 	* <summary>Destroy progress window </summary>
 	*/
 	void endTransfer();
+
+	/*
+	* OVERRIDE
+	* <summary>Dependency injection</summary>
+	* <param name="controlObject">controlObject for events functions</param>
+	*/
+	void bindMainWindowEvents(ControlMainEventsInterface* controlObject);
+
 
 	/*
 	* <summary>Callback for set progress</summary>
@@ -228,12 +260,11 @@ private:
 	*/
 	virtual void buildInterface(void);
 
+	/*
+	*<summary>Create download/upload/new folder/delete button and pack it to box container.</summary>
+	*<returns>Box container with buttons</returns>
+	*/
 	virtual GtkWidget* createStandardButtons(void);
-
-
-
-	virtual void bindMainWindowEvents(ControlMainEventsInterface* controlObject);
-
 
 	/*
 	* Build interface (labels, inputs, buttons) for connectWindow.
@@ -257,6 +288,14 @@ private:
 	* <param name="data">ViewGuiBuilder object - this</param>
 	*/
 	static void mainWindowMenuBarButtonConnectClicked(GtkWidget* object, gpointer* data);
+
+	/*
+	*EVENTCALLBACK
+	*<summary>Callback for disconnect button in menu bar in mainWinow.</summary>
+	* Params: required by lib
+	* <param name="data">ViewGuiBuilder object - this</param>
+	*/
+	static void mainWindowMenuBarButtonDisconnectClicked(GtkWidget* object, gpointer* data);
 
 	/*
 	*EVENTCALLBACK

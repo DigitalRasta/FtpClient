@@ -6,8 +6,7 @@
 
 using namespace FtpClient;
 
-ControlExceptionManager::ControlExceptionManager(ViewGuiBuilderInterface* viewGuiBuilderObject, InnerConfig* cfg, ControlMainEventsInterface* ctrl){
-	this->mainControlObject = ctrl;
+ControlExceptionManager::ControlExceptionManager(ViewGuiBuilderInterface* viewGuiBuilderObject, InnerConfig* cfg){
 	this->viewGuiBuilderObject = viewGuiBuilderObject;
 	this->innerConfigObject = cfg;
 }
@@ -25,54 +24,31 @@ void ControlExceptionManager::manageException(ContainerException &e) {
 			break;
 		case ExceptionCode::ERROR_CONNECTION_LIBCURL_TIMEOUT:
 			this->viewGuiBuilderObject->spawnExceptionWindow("Operation timeout. Please reconnect.", e.level);
-			this->viewGuiBuilderObject->showListInServerTree(NULL);
-			this->viewGuiBuilderObject->activateConnectButton();
-			this->viewGuiBuilderObject->deactivateDisconnectButton();
 			break;
 		case ExceptionCode::ERROR_CONNECTION_LIBCURL_TRANSFER_TYPE:
-			this->viewGuiBuilderObject->spawnExceptionWindow("Transfer problem. Please reconnect and try once again.", e.level);
-			this->viewGuiBuilderObject->showListInServerTree(NULL);
-			this->viewGuiBuilderObject->activateConnectButton();
-			this->viewGuiBuilderObject->deactivateDisconnectButton();
+			this->viewGuiBuilderObject->spawnExceptionWindow("Transfer problem. Please try once again.", e.level);
 			break;
 		case ExceptionCode::ERROR_CONNECTION_LIBCURL_TRANSFER_SIZE_NOT_MATCH:
 			this->viewGuiBuilderObject->spawnExceptionWindow("Transfer problem. Please reconnect and try once again.", e.level);
-			this->viewGuiBuilderObject->showListInServerTree(NULL);
-			this->viewGuiBuilderObject->activateConnectButton();
-			this->viewGuiBuilderObject->deactivateDisconnectButton();
 			break;
 		case ExceptionCode::ERROR_CONNECTION_LIBCURL_TRANSFER_ERROR:
 			this->viewGuiBuilderObject->spawnExceptionWindow("Transfer problem. Please reconnect and try once again.", e.level);
-			this->viewGuiBuilderObject->showListInServerTree(NULL);
-			this->viewGuiBuilderObject->activateConnectButton();
-			this->viewGuiBuilderObject->deactivateDisconnectButton();
 			break;
 		case ExceptionCode::ERROR_CONNECTION_LIBCURL_QUOTE_ERROR:
 			this->viewGuiBuilderObject->spawnExceptionWindow("FTP error. Working with this server problably won't be possible.", e.level);
-			this->viewGuiBuilderObject->showListInServerTree(NULL);
-			this->viewGuiBuilderObject->activateConnectButton();
-			this->viewGuiBuilderObject->deactivateDisconnectButton();
 			break;
 		case ExceptionCode::ERROR_CONNECTION_LIBCURL_UPLOAD_ERROR:
 			this->viewGuiBuilderObject->spawnExceptionWindow("Transfer problem. Please reconnect and try once again.", e.level);
-			this->viewGuiBuilderObject->showListInServerTree(NULL);
-			this->viewGuiBuilderObject->activateConnectButton();
-			this->viewGuiBuilderObject->deactivateDisconnectButton();
 			break;
 		case ExceptionCode::ERROR_CONNECTION_LIBCURL_INVALID_PORT:
 			this->viewGuiBuilderObject->spawnExceptionWindow("Invalid port", e.level);
-			this->viewGuiBuilderObject->showListInServerTree(NULL);
-			this->viewGuiBuilderObject->activateConnectButton();
-			this->viewGuiBuilderObject->deactivateDisconnectButton();
 			break;
 		case ExceptionCode::ERROR_CONNECTION_LIBCURL_UNKNOWN_ERROR:
 			this->viewGuiBuilderObject->spawnExceptionWindow("Cannot connect! Unknown error.", e.level);
-			this->viewGuiBuilderObject->showListInServerTree(NULL);
-			this->viewGuiBuilderObject->activateConnectButton();
-			this->viewGuiBuilderObject->deactivateDisconnectButton();
 			break;
 		case ExceptionCode::ERROR_THREAD_CANNOT_KILL:
 			this->viewGuiBuilderObject->spawnExceptionWindow("Fatal error! Cannot end transfer thread!", e.level);
+			exit(-1);
 			break;
 		case ExceptionCode::ERROR_FILE_IO:
 			this->viewGuiBuilderObject->spawnExceptionWindow("File write error!", e.level);

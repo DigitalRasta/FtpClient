@@ -57,6 +57,9 @@ std::list<ContainerFileInfo>* ModelConnection::getDirectoryContent(std::string p
 		throw ContainerException(ExceptionLevel::EXCEPTIONLEVEL_HIGH, this->translateCurlErrorCode(result));
 	}
 	curl_easy_cleanup(this->libFtpObject);
+	if(path.compare("/") == 0) {
+		this->filesList->push_front(ContainerFileInfo(this->currentPath, std::string("."), -1, true, -1, -1, -1, -1, -1, -1));
+	}
 	return this->filesList;
 }
 

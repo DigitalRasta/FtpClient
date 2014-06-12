@@ -13,11 +13,10 @@ private:
 
 	ViewGuiBuilderInterface* viewGuiBuilderObject;
 	InnerConfig* innerConfigObject;
-	ControlMainEventsInterface* mainControlObject;
 
 public:
 
-	ControlExceptionManager(ViewGuiBuilderInterface* viewGuiBuilderObject, InnerConfig* innerConfigObject, ControlMainEventsInterface* ctrl);
+	ControlExceptionManager(ViewGuiBuilderInterface* viewGuiBuilderObject, InnerConfig* innerConfigObject);
 
 	void manageException(ContainerException &e);
 

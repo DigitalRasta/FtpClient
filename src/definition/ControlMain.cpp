@@ -14,11 +14,13 @@
 using namespace FtpClient;
 
 ControlMain::ControlMain(ViewGuiBuilderInterface* viewGuiBuilderObject, ModelDAOInterface* modelDAOObject, InnerConfig* innerConfigObject):viewGuiBuilderObject(viewGuiBuilderObject), modelDAOObject(modelDAOObject), innerConfigObject(innerConfigObject){
-	this->exceptionManagerObject = new ControlExceptionManager(viewGuiBuilderObject, innerConfigObject, this);
+	this->exceptionManagerObject = new ControlExceptionManager(viewGuiBuilderObject, innerConfigObject);
 	this->localFilesList = NULL;
 	this->transferEnd = false;
 	this->programEnd = false;
 	this->connected = false;
+	this->serverFilesList = NULL;
+	this->localFilesList = NULL;
 }
 
 void ControlMain::startFtpClient(void) {
@@ -43,9 +45,9 @@ void ControlMain::initLocalBrowser(std::string startPath) {
 
 void ControlMain::connectWindowButtonConnectClicked(std::string host, std::string port, std::string login, std::string password) {
 	try {
-		this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
+		//this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
 		//this->modelDAOObject->createNewConnection("ftp.swfwmd.state.fl.us", "21", "anonymous", "anonymous@email.com");
-		//this->modelDAOObject->createNewConnection(host,port,login,password);
+		this->modelDAOObject->createNewConnection(host,port,login,password);
 	} catch (ContainerException &e) {
 		this->exceptionManagerObject->manageException(e);return;
 	}
@@ -245,6 +247,7 @@ void ControlMain::downloadButton(ContainerFileInfo* fileServer) {
 	try {
 		this->modelDAOObject->downloadFile(fileServer->filePath, this->localFilesList->front().filePath, fileServer->fileName, fileServer->fileSize, progressCallback, std::bind(&ControlMain::endTransferCallback, this, std::placeholders::_1));
 	} catch (ContainerException &e) {
+		this->modelDAOObject->deleteLocalFile(&ContainerFileInfo(fileServer->filePath, fileServer->fileName, 0));
 		this->viewGuiBuilderObject->endTransfer();
 		this->exceptionManagerObject->manageException(e);return;
 	}

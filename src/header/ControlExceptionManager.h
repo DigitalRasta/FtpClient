@@ -7,6 +7,9 @@
 namespace FtpClient {
     class ControlExceptionManager;
 }
+/*
+* <summary>Class for exception managing. Spawns information window </summary>
+*/
 class FtpClient::ControlExceptionManager
 {
 private:

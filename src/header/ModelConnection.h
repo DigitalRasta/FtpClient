@@ -11,7 +11,6 @@
 
 namespace FtpClient {
     class ModelConnection;
-	typedef void (*fcallback)(double);
 	struct FtpFile {
 		uint64_t size;
 		uint64_t progress;
@@ -23,26 +22,8 @@ namespace FtpClient {
 * <summary>Class provides methods for communication with FTP server</summary>
 */
 class FtpClient::ModelConnection {
-private:
-	CURL * libFtpObject;
-	InnerConfig* configObject;
-	std::string currentPath;
-	std::string loginPass;
-	std::string hostURL;
-	std::list<ContainerFileInfo>* filesList;
-
-	int transferCode;
-
-	ExceptionCode translateCurlErrorCode(int code);
-
-	static DWORD WINAPI startTransfer(void* Param);
-
-	std::function<void(int)> endDownloadCallback;
-	std::function<void(int)> endUploadCallback;
-
-	bool downloadOrUpload;
-
 public:
+	virtual ~ModelConnection(void);
 	/*
 	*<summary>Constructor, sets params for connection</summary>
 	* <param name="host">Server host - ip or something like host.com</param>
@@ -112,8 +93,14 @@ public:
 	*/
 	void parseLineAndAddToList(std::string line, int id);
 
+	/*
+	* <summary>Delete old list</summary>
+	*/
 	void clearListAndInit(void);
-	virtual ~ModelConnection(void);
+
+	/*
+	* Static callbacks for FTP lib
+	*/
 	static size_t GetFilesList_response(void *ptr, size_t size, size_t nmemb, void * object);
 	static size_t downloadFileWriteFunction(void *buffer, size_t size, size_t nmemb, void *stream);
 	static size_t uploadFileWriteFunction(void *buffer, size_t size, size_t nmemb, void *stream);
@@ -121,5 +108,29 @@ public:
 	HANDLE transferThread;
 	HANDLE transferObserverThread;
 	struct FtpClient::FtpFile transferFileHandler;
+private:
+
+	/*
+	*<summary>Translate error code from FTPlib to ExceptionCode</summary>
+	*/
+	ExceptionCode translateCurlErrorCode(int code);
+
+	/*
+	*<summary>Function required by winapi to thread start</summary>
+	*/
+	static DWORD WINAPI startTransfer(void* Param);
+
+
+	CURL * libFtpObject;
+	InnerConfig* configObject;
+	std::string currentPath;
+	std::string loginPass;
+	std::string hostURL;
+	std::list<ContainerFileInfo>* filesList;
+	int transferCode;
+	std::function<void(int)> endDownloadCallback;
+	std::function<void(int)> endUploadCallback;
+	bool downloadOrUpload;
+
 };
 

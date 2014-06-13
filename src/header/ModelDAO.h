@@ -11,7 +11,6 @@
 
 namespace FtpClient {
     class ModelDAO;
-	typedef void (*fcallback)(double);
 }
 class FtpClient::ModelDAO :
 	public FtpClient::ModelDAOInterface

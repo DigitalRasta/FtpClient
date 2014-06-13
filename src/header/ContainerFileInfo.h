@@ -6,6 +6,9 @@
 namespace FtpClient {
     class ContainerFileInfo;
 }
+/*
+*<summary>Information storage for files</summary>
+*/
 class FtpClient::ContainerFileInfo{
 public:
 	std::string fileName;	     // file or directory name 

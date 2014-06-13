@@ -45,8 +45,6 @@ void ControlMain::initLocalBrowser(std::string startPath) {
 
 void ControlMain::connectWindowButtonConnectClicked(std::string host, std::string port, std::string login, std::string password) {
 	try {
-		//this->modelDAOObject->createNewConnection("ftp-bujnyj.ogicom.pl", "21", "ftpclienttest.bujnyj", "Test1234");
-		//this->modelDAOObject->createNewConnection("ftp.swfwmd.state.fl.us", "21", "anonymous", "anonymous@email.com");
 		this->modelDAOObject->createNewConnection(host,port,login,password);
 	} catch (ContainerException &e) {
 		this->exceptionManagerObject->manageException(e);return;
@@ -112,8 +110,6 @@ void ControlMain::localTreeCellDoubleClick(std::string name) {
 					this->exceptionManagerObject->manageException(e);return;
 				}
 			}
-		} else {
-			//TODO
 		}
 
 	}
@@ -145,8 +141,6 @@ void ControlMain::serverTreeCellDoubleClick(std::string name) {
 			} catch (ContainerException &e) {
 				this->exceptionManagerObject->manageException(e);return;
 			}
-		} else {
-			//TODO
 		}
 
 	}
@@ -293,8 +287,6 @@ void ControlMain::cancelUpload() {
 	} catch (ContainerException &e) {
 		this->exceptionManagerObject->manageException(e);return;
 	}
-	//ContainerFileInfo fileToDelete = ContainerFileInfo(this->localFilesList->front().filePath, this->lastFileTransfer->fileName, 0, false, -1, -1, -1, -1, -1, 0);
-	//this->modelDAOObject->deleteLocalFile(&fileToDelete);
 	this->viewGuiBuilderObject->endTransfer();
 }
 

@@ -8,7 +8,6 @@
 
 namespace FtpClient {
     class ModelDAOInterface;
-	typedef void (*fcallback)(double);
 }
 /*
 * <summary>Public interface for ModelDAO</summary>

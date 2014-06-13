@@ -29,7 +29,9 @@ namespace FtpClient {
 	};
 }
 
-
+/*
+*<summary>Wrapper for exceptions</summary>
+*/
 class FtpClient::ContainerException{
 
 public:
